@@ -8,3 +8,7 @@
 "Numer. Math.":
   url: https://link.springer.com/journal/211
   color: "#009f36"
+
+"Math. Comp.":
+  url: https://www.ams.org/publications/journals/journalsframework/mcom
+  color: "#009f36"

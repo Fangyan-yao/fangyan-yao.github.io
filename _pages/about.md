@@ -6,8 +6,8 @@ subtitle: Research Assistant Professor in AMA @ PolyU
 
 profile:
   align: right
-  image: prof_pic.jpg
-  image_circular: false # crops the image to make it circular
+  image: prof_pic4.jpg
+  image_circular: true # crops the image to make it circular
   more_info: >
     <p>Hung Hom, Hong Kong</p>
     <p>fangyan.yao[AT]polyu.edu.hk</p>
@@ -25,8 +25,8 @@ the design and analysis of algorithms for nonlinear dispersive equations, includ
 - Korteweg-de Vries equations
 - Nonlinear wave equations
 
-I completed both my Ph.D. degrees at [South China University of Technology](https://www.scut.edu.cn/), where I worked under the guidance of Prof. Yongsheng Li on Low-regularity integrators and derivation from mean-field limit of some nonlinear Schrödinger equations. 
-During this time, I was awarded the CSRC as a Joint training Ph.D student in University of Innsbruck, Austria, visiting Prof. 
+I completed both my Ph.D. degrees at [South China University of Technology](https://www.scut.edu.cn/), where I worked under the guidance of Prof. [Yongsheng Li](https://www.researchgate.net/profile/Yongsheng-Li-9/research) on Low-regularity integrators and derivation from mean-field limit of some nonlinear Schrödinger equations. 
+During this time, I was awarded the CSRC as a Joint training Ph.D student in University of Innsbruck, Austria, visiting Prof. [Alexander Ostermann](https://scholar.google.com.au/citations?user=qIGP4rYAAAAJ&hl=en). 
 Afterward, I joined PolyU as a postdoctoral fellow, collaborating with Prof. [Buyang Li](https://libuyang.com/) on developing low-regularity integrators for nonlinear dispersive equations.  
 
 I’m enthusiastic about connecting with fellow researchers and students. If you’re interested in collaborating on exciting numerical PDE projects, feel free to reach out!  

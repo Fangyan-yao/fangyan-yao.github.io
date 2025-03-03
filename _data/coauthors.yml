@@ -1,16 +1,26 @@
 "li":
   - firstname: ["Yongsheng", "Y.", "Y. S."]
-    url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
-
-"li":
+    url: https://www.researchgate.net/profile/Yongsheng-Li-9/research
   - firstname: ["Buyang", "B.", "B. Y."]
     url: https://libuyang.com/
 
+"lin":
+  - firstname: ["Yanping", "Y.", "Y. P."]
+    url: https://www.polyu.edu.hk/ama/staff/malin/malin.htm
+
+"iserles":
+  - firstname: ["Arieh", "A.", "A. I."]
+    url: https://www.damtp.cam.ac.uk/user/ai/Arieh_Iserles/Arieh_Iserles.html
+
+"ostermann":
+  - firstname: ["Alexander", "A.", "A. O."]
+    url: https://scholar.google.com.au/citations?user=qIGP4rYAAAAJ&hl=en
+
 "cao":
   - firstname: ["Jiachuan", "J.", "J. C."]
-    url: https://en.wikipedia.org/wiki/Nathan_Rosen
+    url: https://www.researchgate.net/profile/Jiachuan-Cao-2
 
 "wu":
   - firstname: ["Yifei", "Y. F.", "Y."]
-    url: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+    url: https://scholar.google.com/citations?user=7SpCVeYAAAAJ&hl=en
 
