@@ -26,7 +26,7 @@ the design and analysis of algorithms for nonlinear dispersive equations, includ
 - Nonlinear wave equations
 
 I completed both my Ph.D. degrees at [South China University of Technology](https://www.scut.edu.cn/), where I worked under the guidance of Prof. [Yongsheng Li](https://www.researchgate.net/profile/Yongsheng-Li-9/research) and Prof. [Yifei Wu](https://scholar.google.com/citations?user=7SpCVeYAAAAJ&hl=en) on Low-regularity integrators and derivation from mean-field limit of some nonlinear Schrödinger equations. 
-During this time, I was awarded the CSC as a Joint training Ph.D student in University of Innsbruck, Austria, visiting Prof. [Alexander Ostermann](https://scholar.google.com.au/citations?user=qIGP4rYAAAAJ&hl=en). 
+During this time, I was awarded the CSC scholarship as a joint training Ph.D. student at the University of Innsbruck, Austria, where I had the opportunity to work with Prof. [Alexander Ostermann](https://scholar.google.com.au/citations?user=qIGP4rYAAAAJ&hl=en). 
 Afterward, I joined PolyU as a postdoctoral fellow, collaborating with Prof. [Buyang Li](https://libuyang.com/) on developing low-regularity integrators for nonlinear dispersive equations.  
 
 I’m enthusiastic about connecting with fellow researchers and students. If you’re interested in collaborating on exciting numerical PDE projects, feel free to reach out!  
