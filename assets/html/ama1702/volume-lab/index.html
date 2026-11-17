@@ -15,7 +15,7 @@ h1{font-size:clamp(34px,5vw,58px);letter-spacing:-.05em;line-height:1.12;margin:
 fieldset{border:0;padding:0;margin:0;min-width:0}fieldset:disabled{opacity:.55}legend,.select-label{padding:0;display:block;color:var(--muted);font-weight:650;font-size:12px;margin-bottom:5px}.segments{display:flex;flex-wrap:wrap;gap:3px;background:#edf2f8;border:1px solid #dce5ef;border-radius:9px;padding:3px}
 button{min-height:36px;border:1px solid var(--hair);background:#fff;border-radius:8px;padding:6px 12px;color:var(--ink);font-weight:650}button:hover:not(:disabled){background:#eaf0fb}button:disabled{cursor:default}.segments button{font-size:13px;background:transparent;border-color:transparent;white-space:nowrap}.segments button[aria-pressed=true]{background:#214783;color:#fff}.segments button:disabled:not([aria-pressed=true]){color:#5b6c80}
 .grid{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(330px,1fr);gap:15px;align-items:start}.card{border-radius:var(--radius);background:var(--white);border:1px solid var(--hair);min-width:0;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;padding:14px 17px}.caption{color:var(--muted);font-size:12px}.stage{background:var(--stage);color:#fff;border-color:var(--stage)}.stage .caption{color:#a8b9cf}
-canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-action:none;cursor:grab;background:radial-gradient(ellipse at 46% 48%,#192f4c,#101d31 77%)}#solid:active{cursor:grabbing}#plane{height:190px;background:#f7fafe}
+canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);background:radial-gradient(ellipse at 46% 48%,#192f4c,#101d31 77%)}#plane{height:190px;background:#f7fafe}
 .region-views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#f7fafe}.region-views.solo{grid-template-columns:1fr}.region-views figure{margin:0;min-width:0}.region-views figure+figure{border-left:1px solid var(--hair)}.region-views figcaption{padding:6px 10px 0;color:var(--muted);font-size:11px;font-weight:700}#rotation-canvas{background:#f7fafe}.rotation-tools{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;padding:10px 15px 12px;font-size:12px;border-top:1px solid #e5edf5}.rotation-tools button{min-height:32px;font-size:12px}.rotation-tools output{font:650 13px ui-monospace,monospace;color:#214783}.rotation-key{display:flex;gap:6px 13px;flex:1 0 100%;flex-wrap:wrap;color:var(--muted)}.rotation-key span{display:inline-flex;align-items:center;gap:5px}.key-line{display:inline-block;width:13px;border-top:3px solid #a35710}.key-line.inner{border-top:2px dashed #15726c}.rotation-tools[hidden],.region-views [hidden]{display:none}
 .stage-controls{border-top:1px solid #293c55;padding:9px 16px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:12px;color:#d0dae9}.stage-controls label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}.stage-controls button{color:#e8f0fa;background:transparent;border-color:#45617c;min-height:31px;padding:4px 10px;margin-left:auto}.stage-controls button:hover:not(:disabled){background:#2f445f}.stage-controls input{accent-color:#ffce72}button[hidden],label[hidden]{display:none}
 .legend{display:inline-flex;gap:7px;align-items:center}.swatch{height:9px;width:9px;border-radius:3px;background:var(--gold)}.swatch.rest{background:#98b9e1}.rotation-key [hidden]{display:none}.coordinate-key{margin:0;flex-basis:100%;color:var(--muted);font-size:11px}.axis-x{color:#285cb3}.axis-y{color:#087b65}.axis-z{color:#68449d}
@@ -80,7 +80,8 @@ canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-acti
 <div class="controls">
   <fieldset><legend data-zh="课件顺序">Lecture sequence</legend><div class="segments">
     <button type="button" data-method="disk" aria-pressed="true" data-zh="1. 圆盘法 · 绕 x 轴">1. Disk method · about x</button>
-    <button type="button" data-method="shell" aria-pressed="false" data-zh="2. 圆柱壳法 · 绕 y 轴">2. Shell method · about y</button>
+    <button type="button" data-method="shifted" aria-pressed="false" data-zh="2. 圆盘法 · 绕 x = 1">2. Disk method · about x = 1</button>
+    <button type="button" data-method="shell" aria-pressed="false" data-zh="3. 圆柱壳法 · 绕 y 轴">3. Shell method · about y</button>
   </div></fieldset>
 </div>
 <section id="generation-stage" class="lesson-phase" aria-labelledby="generation-title">
@@ -95,7 +96,7 @@ canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-acti
       <button type="button" id="rotate-demo" data-zh="播放一周旋转">Play one rotation</button>
       <output id="rotation-angle" aria-live="off">θ = 0°</output>
       <button type="button" class="camera-reset" id="reset-generation-view" data-zh="重置相机">Reset camera</button>
-      <div class="rotation-key"><span><i class="key-line"></i><span data-zh="母线 y = f(x)">Generating curve y = f(x)</span></span></div>
+      <div class="rotation-key"><span><i class="key-line"></i><span id="generating-curve-key"></span></span></div>
       <p class="coordinate-key"><b class="axis-x">x</b><span data-zh="、"> and </span><b class="axis-y">y</b><span data-zh=" 轴与左图同色。"> match the left diagram. </span><b class="axis-z">z</b><span data-zh=" 轴垂直于左图平面。两张图的 P₀ 对应母线上的同一点。"> is perpendicular to that plane. P₀ marks the same point on the curve in both diagrams.</span></p>
     </div>
   </section>
@@ -106,18 +107,17 @@ canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-acti
 <section id="volume-stage" class="lesson-phase" aria-labelledby="volume-title" hidden>
   <div class="phase-header">
     <div><h2 id="volume-title" tabindex="-1" data-zh="计算体积">Calculate the volume</h2>
-    <p data-zh="拖动选中一条竖直条带，再播放旋转，观察它生成的小块。">Drag to select a vertical strip, then revolve it to see how it forms a volume piece.</p></div>
+    <p id="volume-intro"></p></div>
     <button type="button" id="back-generation" data-zh="← 返回看立体的生成">← Back to the generating region</button>
   </div>
 <div class="grid volume-views">
   <section class="card stage" aria-labelledby="solid-title">
-    <div class="card-head"><h2 id="solid-title" data-zh="三维剖分">3D partition</h2><span class="caption" data-zh="在图上拖动可旋转视角">Drag to rotate the view</span></div>
+    <div class="card-head"><h2 id="solid-title" data-zh="三维剖分">3D partition</h2><span class="caption" data-zh="固定视角">Fixed view</span></div>
     <canvas id="solid" role="img" aria-label="3D view of the selected volume element" data-zh-aria="当前选中体积小块的三维视图"></canvas>
     <div class="stage-controls">
       <span class="legend"><span class="swatch"></span><span data-zh="当前小块">Selected piece</span></span>
       <span class="legend"><span class="swatch rest"></span><span data-zh="其余剖分">Other pieces</span></span>
       <label><input id="isolate" type="checkbox"><span data-zh="只看当前小块">Show only the selected piece</span></label>
-      <button type="button" id="reset" data-zh="重置视角">Reset view</button>
     </div>
   </section>
   <section class="card" aria-labelledby="plane-title">
@@ -166,7 +166,7 @@ canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-acti
   </div>
   </div>
 </section>
-<div class="phase-nav" id="next-method-nav"><button type="button" class="primary" id="next-method" data-zh="下一节：圆柱壳法 →">Next: Shell method →</button></div>
+<div class="phase-nav" id="next-method-nav"><button type="button" class="primary" id="next-method"></button></div>
 </section>
 </main>
 <script>
@@ -178,34 +178,47 @@ const staticText = Array.from(document.querySelectorAll("[data-zh]"), node => [n
 const staticLabels = Array.from(document.querySelectorAll("[data-zh-aria]"), node => [node, node.getAttribute("aria-label"), node.dataset.zhAria]);
 
 const PI = Math.PI;
-const defaultView = { yaw: 0.83, pitch: 0.44 };
-const defaultGenerationView = { yaw: 0.91, pitch: 0.46 };
-const generationCamera = { ...defaultGenerationView };
-const state = {
-  method: "disk",
-  get axis() { return this.method === "disk" ? "x" : "y"; },
-  ...defaultView,
-};
-let phase = "generation";
-const midpoint = (a, b) => (a + b) / 2;
+const defaultGenerationView = {yaw: .91, pitch: .46};
+const generationCamera = {...defaultGenerationView};
+const midpoint = (a,b) => (a + b) / 2;
 
-const [domainStart, domainEnd] = [1, 5];
-const heightAt = x => 1 + 2 * ((x - domainStart) / (domainEnd - domainStart)) ** 2;
-const curve = Array.from({length:33}, (_,i) => {
-  const x = domainStart + (domainEnd - domainStart) * i / 32;
-  return [x,heightAt(x)];
-});
-const region = [[domainStart,0], ...curve, [domainEnd,0]];
+function makeProfile(start,end,heightAt) {
+  const curve = Array.from({length:41}, (_,i) => {
+    const x = start + (end - start) * i / 40;
+    return [x,heightAt(x)];
+  });
+  return {start,end,heightAt,curve,region:[[start,0], ...curve, [end,0]]};
+}
+
+const lectureProfile = makeProfile(1,5,x => 1 + 2 * ((x - 1) / 4) ** 2);
+const parabola = makeProfile(0,1,x => x ** 2);
+const lessons = {
+  disk: {
+    axis:"x", axisX:0, variable:"x", profile:lectureProfile,
+    partitionView:{yaw:.10,pitch:0,center:[2.6,0,0],span:[6.95,7.4]},
+  },
+  shifted: {
+    axis:"y", axisX:1, variable:"y", profile:parabola,
+    partitionView:{yaw:.25,pitch:.22,center:[.98,.5,0],span:[2.8,2.1]},
+  },
+  shell: {
+    axis:"y", axisX:0, variable:"x", profile:lectureProfile,
+    partitionView:{yaw:.83,pitch:.44,center:[0,1.4,0],span:[11,7.5]},
+  },
+};
+let method = "disk";
+let phase = "generation";
 
 function partition(n) {
-  const step = (domainEnd - domainStart) / n;
+  const {profile,variable} = lessons[method];
+  const step = (profile.end - profile.start) / n;
   const pieces = Array.from({length:n}, (_,i) => {
-    const a = domainStart + i * step;
+    const a = profile.start + i * step;
     const b = a + step;
     const m = midpoint(a,b);
-    const height = heightAt(m);
-    const mesh = state.method === "disk" ? [a,b,0,height] : [0,height,a,b];
-    return {a,b,m,height,mesh};
+    const size = variable === "y" ? 1 - Math.sqrt(m) : profile.heightAt(m);
+    const mesh = method === "shell" ? [0,size,a,b] : [a,b,0,size];
+    return {a,b,m,size,mesh};
   });
   return {step,pieces};
 }
@@ -238,10 +251,12 @@ function dot(a, b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-function radialPoint(axis, t, r, angle) {
+function radialPoint(lesson,t,r,angle) {
   const c = r * Math.cos(angle);
   const s = r * Math.sin(angle);
-  return axis === "x" ? [t, c, s] : [c, t, -s];
+  if (lesson.axis === "x") return [t,c,s];
+  const direction = lesson.axisX ? -1 : 1;
+  return [lesson.axisX + direction * c,t,-direction * s];
 }
 
 const generatorStyle = { outer: "#a35710", inner: "#15726c" };
@@ -290,11 +305,11 @@ function labelInterval(ctx, from, to, variable) {
   const labels = [variable, variable + " + Δ" + variable];
   [from,to].forEach(([x,y], index) => {
     const side = direction * (index === 0 ? -1 : 1);
-    const shiftX = horizontal ? 5 * side : -6;
+    const shiftX = horizontal ? 5 * side : 6;
     const shiftY = horizontal ? -7 : 8 * side;
     ctx.save();
     ctx.font = "700 11px system-ui";
-    ctx.textAlign = horizontal && side > 0 ? "left" : "right";
+    ctx.textAlign = !horizontal || side > 0 ? "left" : "right";
     ctx.textBaseline = horizontal ? "alphabetic" : "middle";
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#fff";
@@ -331,10 +346,33 @@ function dimensionLine(ctx, from, to, color, weight = 1.5) {
   }
 }
 
+function drawShiftAxis(ctx,from,to) {
+  ctx.strokeStyle = "#9c3a34";
+  ctx.lineWidth = 1.6;
+  ctx.setLineDash([4,3]);
+  path(ctx,[from,to]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = "#9c3a34";
+  ctx.font = "700 11px system-ui";
+  ctx.fillText("x = 1",to[0] + 6,Math.max(13,to[1] + 4));
+}
+
 function drawPlanarDimensions(ctx, toPixel, piece, width) {
-  const shell = state.method === "shell";
+  if (method === "shifted") {
+    const from = toPixel([1 - piece.size,piece.m]);
+    const to = toPixel([1,piece.m]);
+    dimensionLine(ctx,from,to,generatorStyle.outer);
+    const [x,y] = from;
+    const label = "R = 1 − √y*";
+    ctx.font = "700 11px system-ui";
+    const dx = Math.min(4,to[0] - x - ctx.measureText(label).width);
+    markedPoint(ctx,from,label,generatorStyle.outer,Math.max(4 - x,dx),-10);
+    return;
+  }
+  const shell = method === "shell";
   const [x,base] = toPixel([piece.m,0]);
-  const high = toPixel([piece.m,piece.height]);
+  const high = toPixel([piece.m,piece.size]);
   const radiusColor = generatorStyle.outer;
   const heightColor = shell ? generatorStyle.inner : radiusColor;
   dimensionLine(ctx,[x + 6,base],[x + 6,high[1]],heightColor);
@@ -367,11 +405,12 @@ function projection(width, height, unit, center, {yaw,pitch}) {
 function drawSolid(data, selected) {
   const { ctx, width, height } = prepareCanvas($("solid"));
   if (!width || !height) return;
-  const {axis} = state;
+  const lesson = lessons[method];
+  const {axis,axisX,partitionView} = lesson;
   const isolate = $("isolate").checked;
-  const center = axis === "x" ? [3,0,0] : [0,1.4,0];
-  const unit = Math.min((width - 36) / (axis === "x" ? 8.3 : 11), (height - 36) / 7.5);
-  const project = projection(width,height,unit,center,state);
+  const {center,span} = partitionView;
+  const unit = Math.min((width - 36) / span[0], (height - 36) / span[1]);
+  const project = projection(width,height,unit,center,partitionView);
 
   ctx.fillStyle = "#ffffff0b";
   for (let x = 16; x < width; x += 24) for (let y = 12; y < height; y += 24) ctx.fillRect(x, y, 1.5, 1.5);
@@ -387,7 +426,7 @@ function drawSolid(data, selected) {
 
   const steps = 40;
   const angles = Array.from({ length: steps + 1 }, (_, i) => i * 2 * PI / steps);
-  const arc = (t, r) => angles.map(angle => radialPoint(axis, t, r, angle));
+  const arc = (t, r) => angles.map(angle => radialPoint(lesson,t,r,angle));
   data.pieces.forEach((piece, i) => {
     const active = i === selected;
     if (isolate && !active) return;
@@ -433,10 +472,15 @@ function drawSolid(data, selected) {
 
   const axisPoint = (name, t) => name === "x" ? [t,0,0] : [0,t,0];
   ctx.font = "700 13px system-ui";
-  for (const name of ["x", "y"]) {
-    const primary = name === axis;
-    const a = project(axisPoint(name, -0.58));
-    const b = project(axisPoint(name, name === "x" ? 5.7 : 3.85));
+  const shifted = axisX !== 0;
+  const guides = [
+    ["x",axisPoint("x",shifted ? -.22 : -.58),axisPoint("x",shifted ? 2.16 : 5.7),axis === "x"],
+    ["y",axisPoint("y",shifted ? -.16 : -.58),axisPoint("y",shifted ? 1.3 : 3.85),axis === "y" && !shifted],
+  ];
+  if (shifted) guides.push(["x = 1",[axisX,-.2,0],[axisX,1.3,0],true]);
+  for (const [name,from,to,primary] of guides) {
+    const a = project(from);
+    const b = project(to);
     ctx.strokeStyle = primary ? "#83eee2" : "#a9b5c8";
     ctx.lineWidth = primary ? 1.45 : 1;
     ctx.setLineDash(primary ? [5, 5] : [2, 5]);
@@ -447,7 +491,7 @@ function drawSolid(data, selected) {
     path(ctx, [b, [b[0] - 8 * Math.cos(angle - .4), b[1] - 8 * Math.sin(angle - .4)], [b[0] - 8 * Math.cos(angle + .4), b[1] - 8 * Math.sin(angle + .4)]], true);
     ctx.fillStyle = primary ? "#a7fff1" : "#ccd7e6";
     ctx.fill();
-    ctx.fillText(name, Math.max(5, Math.min(width - 13, b[0] + 7)), Math.max(13, Math.min(height - 5, b[1] + 4)));
+    ctx.fillText(name, Math.max(5, Math.min(width - ctx.measureText(name).width - 5, b[0] + 7)), Math.max(13, Math.min(height - 5, b[1] + 4)));
   }
   ctx.fillStyle = "#becfe4";
   ctx.font = "12px system-ui";
@@ -456,10 +500,13 @@ function drawSolid(data, selected) {
 
 function drawPlane(canvas, data = null, selected = 0) {
   const {ctx,width,height} = prepareCanvas(canvas);
-  const xMin = -.4;
-  const xMax = 5.7;
-  const yMin = -.4;
-  const yMax = 3.65;
+  const {axis,axisX,variable,profile} = lessons[method];
+  const {curve,region,start,end,heightAt} = profile;
+  const shifted = axisX !== 0;
+  const xMin = shifted ? -.22 : -.4;
+  const xMax = shifted ? 1.56 : 5.7;
+  const yMin = shifted ? -.16 : -.4;
+  const yMax = shifted ? 1.23 : 3.65;
   const scale = Math.min((width - 45) / (xMax - xMin), (height - 59) / (yMax - yMin));
   const left = (width - scale * (xMax - xMin)) / 2;
   const top = 17;
@@ -468,11 +515,11 @@ function drawPlane(canvas, data = null, selected = 0) {
     path(ctx,[toPixel(from),toPixel(to)]);
     ctx.stroke();
   }
-
+  const gridStep = shifted ? .25 : 1;
   ctx.lineWidth = 1;
   ctx.strokeStyle = "#dce6f1";
-  for (let x = 0; x < xMax; x++) plotLine([x,yMin],[x,yMax]);
-  for (let y = 0; y < yMax; y++) plotLine([xMin,y],[xMax,y]);
+  for (let x = 0; x < xMax; x += gridStep) plotLine([x,yMin],[x,yMax]);
+  for (let y = 0; y < yMax; y += gridStep) plotLine([xMin,y],[xMax,y]);
 
   path(ctx,region.map(toPixel),true);
   ctx.fillStyle = "#dce9f8";
@@ -483,15 +530,19 @@ function drawPlane(canvas, data = null, selected = 0) {
     ctx.clip();
     ctx.strokeStyle = "#7292ba";
     ctx.lineWidth = .7;
-    for (const {b} of data.pieces) plotLine([b,yMin],[b,yMax]);
-    const from = toPixel([piece.a,yMax]);
-    const to = toPixel([piece.b,yMin]);
+    for (const {b} of data.pieces) {
+      if (shifted) plotLine([xMin,b],[xMax,b]);
+      else plotLine([b,yMin],[b,yMax]);
+    }
+    const from = toPixel(shifted ? [xMin,piece.b] : [piece.a,yMax]);
+    const to = toPixel(shifted ? [xMax,piece.a] : [piece.b,yMin]);
     ctx.fillStyle = "#f4ad34a8";
     ctx.fillRect(from[0],from[1],to[0] - from[0],to[1] - from[1]);
     ctx.restore();
 
-    const corners = [[piece.a,0],[piece.b,0],[piece.b,piece.height],[piece.a,piece.height]];
-    path(ctx,corners.map(toPixel),true);
+    const corners = [[piece.a,0],[piece.b,0],[piece.b,piece.size],[piece.a,piece.size]];
+    const toPlane = ([t,r]) => shifted ? [axisX - r,t] : [t,r];
+    path(ctx,corners.map(toPlane).map(toPixel),true);
     ctx.strokeStyle = "#9e570c";
     ctx.lineWidth = 1.25;
     ctx.setLineDash([3,2]);
@@ -507,47 +558,58 @@ function drawPlane(canvas, data = null, selected = 0) {
   ctx.lineWidth = 2.8;
   ctx.stroke();
 
-  axisArrow(ctx,toPixel([xMin,0]),toPixel([xMax,0]),"x",state.axis === "x");
-  axisArrow(ctx,toPixel([0,yMin]),toPixel([0,yMax]),"y",state.axis === "y");
+  axisArrow(ctx,toPixel([xMin,0]),toPixel([xMax,0]),"x",axis === "x");
+  axisArrow(ctx,toPixel([0,yMin]),toPixel([0,yMax]),"y",axis === "y" && !shifted);
+  if (shifted) drawShiftAxis(ctx,toPixel([axisX,yMin]),toPixel([axisX,yMax]));
   ctx.fillStyle = "#4d6887";
   ctx.font = "italic 13px Georgia";
-  for (const [x,label] of [[domainStart,"a"],[domainEnd,"b"]]) {
+  const bounds = shifted ? [[1,"1"]] : [[start,"a"],[end,"b"]];
+  for (const [x,label] of bounds) {
     const [px,py] = toPixel([x,0]);
     ctx.fillText(label,px - 3,py + 15);
+  }
+  if (shifted) {
+    const [px,py] = toPixel([0,1]);
+    ctx.fillText("1",px - 13,py + 4);
   }
   markedPoint(ctx,toPixel([0,0]),"O","#334e6d",-12,13);
 
   if (piece) {
-    const ends = [[piece.a,3.25],[piece.b,3.25]].map(toPixel);
+    const edge = t => shifted ? [1.22,t] : [t,3.25];
+    const ends = [piece.a,piece.b].map(t => toPixel(edge(t)));
     ctx.strokeStyle = "#a65a0d";
     ctx.lineWidth = 1;
     ctx.setLineDash([3,3]);
-    for (const x of [piece.a,piece.b]) plotLine([x,0],[x,3.25]);
+    for (const t of [piece.a,piece.b]) plotLine(shifted ? [Math.sqrt(t),t] : [t,0],edge(t));
     ctx.setLineDash([]);
     path(ctx,ends);
     ctx.stroke();
-    labelInterval(ctx,...ends,"x");
+    labelInterval(ctx,...ends,variable);
     drawPlanarDimensions(ctx,toPixel,piece,width);
   } else {
-    const middle = midpoint(domainStart,domainEnd);
+    const middle = midpoint(start,end);
     markedPoint(ctx,toPixel([middle,heightAt(middle)]),"P₀",generatorStyle.outer,6,14);
-    const [px,py] = toPixel([2.3,1.95]);
+    const [px,py] = toPixel(shifted ? [.43,.67] : [2.3,1.95]);
     ctx.fillStyle = generatorStyle.outer;
     ctx.font = "italic 15px Georgia";
-    ctx.fillText("y = f(x)",px - 20,py);
+    ctx.fillText(shifted ? "y = x²" : "y = f(x)",px - 20,py);
   }
-  return {scale,xMin,left};
+  return {scale,xMin,yMax,left,top};
 }
 
 function drawSweep(canvas, camera, rotationAngle, strip = null) {
   const { ctx, width, height } = prepareCanvas(canvas);
   if (!width || !height) return;
-  const {axis} = state;
-  const center = axis === "x" ? [3,.35,0] : [0,1.4,0];
-  const unit = Math.min((width - 24) / (axis === "x" ? 9.3 : 11), (height - 24) / (axis === "x" ? 7.9 : 8.2));
+  const lesson = lessons[method];
+  const {axis,axisX,variable,profile} = lesson;
+  const {curve,region,start,end,heightAt} = profile;
+  const shifted = axisX !== 0;
+  const center = shifted ? [1,.57,0] : axis === "x" ? [3,.35,0] : [0,1.4,0];
+  const span = shifted ? [2.8,2.25] : axis === "x" ? [9.3,7.9] : [11,8.2];
+  const unit = Math.min((width - 24) / span[0], (height - 24) / span[1]);
   const project = projection(width,height,unit,center,camera);
-  const pointAt = (t,r,angle) => project(radialPoint(axis,t,r,angle));
-  const axialRadial = ([x,y]) => axis === "x" ? [x,y] : [y,x];
+  const pointAt = (t,r,angle) => project(radialPoint(lesson,t,r,angle));
+  const axialRadial = ([x,y]) => axis === "x" ? [x,y] : [y,Math.abs(x - axisX)];
   const [a,b,inner,outer] = strip?.mesh ?? [];
   const stripCorners = [[a,inner],[a,outer],[b,outer],[b,inner]];
   const polygon = strip ? stripCorners : region.map(axialRadial);
@@ -579,8 +641,11 @@ function drawSweep(canvas, camera, rotationAngle, strip = null) {
   }
 
   // The reference grid is the xy plane from the left diagram.
-  for (let x = 0; x <= 5; x++) stroke([[x,0,0],[x,3.25,0]].map(project), "#c9d9e9", .8);
-  for (let y = 0; y <= 3; y++) stroke([[0,y,0],[5.25,y,0]].map(project), "#c9d9e9", .8);
+  const gridStep = shifted ? .25 : 1;
+  const gridWidth = shifted ? 2 : 5.25;
+  const gridHeight = shifted ? 1.2 : 3.25;
+  for (let x = 0; x <= gridWidth; x += gridStep) stroke([[x,0,0],[x,gridHeight,0]].map(project), "#c9d9e9", .8);
+  for (let y = 0; y <= gridHeight; y += gridStep) stroke([[0,y,0],[gridWidth,y,0]].map(project), "#c9d9e9", .8);
 
   const steps = Math.max(1, Math.ceil(rotationAngle / oneTurn * 42));
   const angles = Array.from({ length: steps + 1 }, (_, i) => rotationAngle * i / steps);
@@ -619,24 +684,26 @@ function drawSweep(canvas, camera, rotationAngle, strip = null) {
   }
 
   const origin = project([0,0,0]);
-  const directions = {x:[5.6,0,0],y:[0,3.72,0],z:[0,0,3.35]};
+  const directions = shifted ? {x:[2.2,0,0],y:[0,1.25,0],z:[0,0,.85]} :
+    {x:[5.6,0,0],y:[0,3.72,0],z:[0,0,3.35]};
   for (const [name,tip] of Object.entries(directions)) {
-    axisArrow(ctx,origin,project(tip),name,axis === name);
+    axisArrow(ctx,origin,project(tip),name,axis === name && !shifted);
   }
-  stroke([origin,project([0,0,-2.5])],coordinateColors.z + "66",.9,[4,3]);
+  stroke([origin,project([0,0,shifted ? -.65 : -2.5])],coordinateColors.z + "66",.9,[4,3]);
+  if (shifted) drawShiftAxis(ctx,project([axisX,-.15,0]),project([axisX,1.25,0]));
   markedPoint(ctx,origin,"O","#334e6d",4,-5);
 
   if (strip) {
-    const axial = axis === "x";
+    const axial = method !== "shell";
     const ends = (axial ? [[a,outer],[b,outer]] : [[b,inner],[b,outer]])
       .map(p => pointAt(...p,rotationAngle));
     stroke(ends, "#9b5110", 1.7);
-    labelInterval(ctx,...ends,"x");
+    labelInterval(ctx,...ends,variable);
   } else {
-    const middle = midpoint(domainStart,domainEnd);
+    const middle = midpoint(start,end);
     const [t,radius] = axialRadial([middle,heightAt(middle)]);
     stroke(angles.map(angle => pointAt(t,radius,angle)), generatorStyle.outer + "99", 1.3, [4,3]);
-    const start = pointAt(t,radius,0);
+    const initialPoint = pointAt(t,radius,0);
     const marker = pointAt(t,radius,rotationAngle);
     if (rotationAngle > .22 && rotationAngle < oneTurn - .02) {
       const previous = pointAt(t,radius,rotationAngle - .12);
@@ -644,9 +711,9 @@ function drawSweep(canvas, camera, rotationAngle, strip = null) {
       const wing = angle => [marker[0] - 7 * Math.cos(angle), marker[1] - 7 * Math.sin(angle)];
       stroke([wing(direction - .5), marker, wing(direction + .5)], generatorStyle.outer, 1.7);
     }
-    const startLabelX = start[0] > width - 30 ? -18 : 6;
-    markedPoint(ctx,start,"P₀",generatorStyle.outer,startLabelX,-6);
-    if (Math.hypot(marker[0] - start[0], marker[1] - start[1]) > 12) {
+    const startLabelX = initialPoint[0] > width - 30 ? -18 : 6;
+    markedPoint(ctx,initialPoint,"P₀",generatorStyle.outer,startLabelX,-6);
+    if (Math.hypot(marker[0] - initialPoint[0], marker[1] - initialPoint[1]) > 12) {
       const markerLabelX = marker[0] > width - 30 ? -18 : 6;
       markedPoint(ctx,marker,"Pθ",generatorStyle.outer,markerLabelX,13);
     }
@@ -654,39 +721,81 @@ function drawSweep(canvas, camera, rotationAngle, strip = null) {
 
   const angle = Math.round(rotationAngle * 180 / PI);
   $(strip ? "strip-angle" : "rotation-angle").value = "θ = " + angle + "°";
-  if (strip) {
-    canvas.setAttribute("aria-label", tr(`The selected strip from x to x plus delta x, rotated ${angle} degrees about the ${axis}-axis.`,
-      `从 x 到 x + Δx 的高亮条带，绕 ${axis} 轴旋转 ${angle} 度。`));
-    return;
-  }
-  canvas.setAttribute("aria-label", tr(
-    `The x, y and z axes and the reference grid at z = 0. P₀ rotates ${angle} degrees about the ${axis}-axis to reach Pθ.`,
-    `三维 x、y、z 坐标轴和 z = 0 的参考网格。母线上的 P₀ 绕 ${axis} 轴旋转 ${angle} 度到达 Pθ。`
-  ));
+  const about = shifted ? tr("the line x = 1","直线 x = 1") : tr(`the ${axis}-axis`,`${axis} 轴`);
+  canvas.setAttribute("aria-label", strip
+    ? tr(`The selected strip from ${variable} to ${variable} + Δ${variable} rotates ${angle} degrees about ${about}.`,
+      `从 ${variable} 到 ${variable} + Δ${variable} 的条带绕${about}旋转 ${angle} 度。`)
+    : tr(`P₀ rotates ${angle} degrees about ${about}. The reference grid is at z = 0.`,
+      `P₀ 绕${about}旋转 ${angle} 度。参考网格位于 z = 0。`));
 }
 
 const oneTurn = 2 * PI;
 const stripCamera = { ...defaultGenerationView };
 let selectedStrip;
 
-function drawPieceDiagram(canvas, shell) {
+function drawPieceDiagram(canvas) {
   const {ctx,width,height} = prepareCanvas(canvas);
   if (!width || !height) return;
-  const scale = Math.min(width / 286, height / 190);
+  const scale = Math.min(width / 320, height / 190);
   ctx.save();
-  ctx.translate((width - 286 * scale) / 2, (height - 190 * scale) / 2);
+  ctx.translate((width - 320 * scale) / 2, (height - 190 * scale) / 2);
   ctx.scale(scale,scale);
 
-  const cx = 126;
+  const outerColor = generatorStyle.outer;
+  const innerColor = generatorStyle.inner;
+  const widthColor = coordinateColors.x;
+  function measure(from, to, label, labelX, labelY, color) {
+    dimensionLine(ctx,from,to,color);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "#f7fafe";
+    ctx.lineWidth = 3;
+    ctx.font = "700 14px system-ui";
+    ctx.strokeText(label,labelX,labelY);
+    ctx.fillText(label,labelX,labelY);
+  }
+  if (method === "disk") {
+    const frontX = 144;
+    const backX = 170;
+    const midY = 87;
+    const rx = 36;
+    const ry = 66;
+    ctx.beginPath();
+    ctx.ellipse(frontX,midY,rx,ry,0,-PI / 2,PI / 2);
+    ctx.lineTo(backX,midY + ry);
+    ctx.ellipse(backX,midY,rx,ry,0,PI / 2,-PI / 2,true);
+    ctx.closePath();
+    ctx.fillStyle = "#e6b878";
+    ctx.strokeStyle = "#a06f37";
+    ctx.lineWidth = 1.3;
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(frontX,midY,rx,ry,0,0,2 * PI);
+    ctx.fillStyle = "#ffebc5";
+    ctx.fill();
+    ctx.stroke();
+
+    measure([frontX,midY],[frontX,midY - ry],"R = f(x*)",frontX + 10,midY - 33,outerColor);
+    measure([frontX,midY + ry + 16],[backX,midY + ry + 16],"Δx",backX + 8,midY + ry + 21,widthColor);
+    ctx.strokeStyle = "#285cb370";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2,2]);
+    for (const x of [frontX,backX]) {
+      path(ctx,[[x,midY + ry],[x,midY + ry + 14]]);
+      ctx.stroke();
+    }
+    ctx.restore();
+    return;
+  }
+
+  const shell = method === "shell";
+  const cx = shell ? 113 : 131;
   const y = shell ? 56 : 77;
   const outer = 83;
   const inner = shell ? 70 : 0;
   const depth = shell ? 87 : 20;
   const tilt = .31;
-  const outerColor = generatorStyle.outer;
-  const innerColor = generatorStyle.inner;
-  const widthColor = coordinateColors.x;
-  const thickness = "Δx";
+  const thickness = shell ? "Δx" : "Δy";
   const farSide = cx + outer;
   const lowerY = y + depth;
 
@@ -730,23 +839,14 @@ function drawPieceDiagram(canvas, shell) {
   ctx.strokeStyle = "#a06f37";
   ctx.stroke();
 
-  function measure(from, to, label, labelX, labelY, color) {
-    dimensionLine(ctx,from,to,color);
-    ctx.fillStyle = color;
-    ctx.strokeStyle = "#f7fafe";
-    ctx.lineWidth = 3;
-    ctx.font = "700 14px system-ui";
-    ctx.strokeText(label,labelX,labelY);
-    ctx.fillText(label,labelX,labelY);
-  }
   if (shell) {
     const middleRadius = (inner + outer) / 2;
     dimensionLine(ctx,[cx,y],[cx + middleRadius,y],"#ffebc5",3.5);
-    measure([cx,y],[cx + middleRadius,y],"r",cx + 36,y - 8,outerColor);
-    measure([farSide + 20,y],[farSide + 20,lowerY],"h",farSide + 29,y + depth / 2 + 4,innerColor);
+    measure([cx,y],[cx + middleRadius,y],"r = x*",cx + 20,y - 8,outerColor);
+    measure([farSide + 20,y],[farSide + 20,lowerY],"h = |f(x*)|",farSide + 26,y + depth / 2 + 4,innerColor);
     measure([cx - outer,y],[cx - inner,y],thickness,cx - outer - 3,y - 13,widthColor);
   } else {
-    measure([cx,y],[cx + outer,y],"R",cx + 41,y - 8,outerColor);
+    measure([cx,y],[cx + outer,y],"R = 1 − √y*",cx + 6,y - 9,outerColor);
     measure([farSide + 20,y],[farSide + 20,lowerY],thickness,farSide + 29,y + 15,widthColor);
   }
   ctx.strokeStyle = shell ? "#15726c70" : "#285cb370";
@@ -803,12 +903,14 @@ const stripSweep = makeSweep($("strip-play"),
   angle => { if (selectedStrip) drawSweep($("strip-canvas"),stripCamera,angle,selectedStrip); }, true);
 
 function describe(data, selected) {
-  const {axis,method} = state;
+  const {axis,axisX,variable} = lessons[method];
+  const shifted = axisX !== 0;
   const shell = method === "shell";
   const {pieces} = data;
   const [enType,zhType] = shell ? ["shell","圆柱壳"] : ["disk","圆盘"];
   const index = selected + 1;
-  const interval = "[x, x + Δx]";
+  const thickness = "Δ" + variable;
+  const interval = `[${variable}, ${variable} + ${thickness}]`;
   $("plane-title").textContent = tr("Planar partition", "平面剖分");
   $("plane-caption").textContent = tr("xy plane · drag to select", "xy 平面 · 可拖动");
   $("piece-label").textContent = tr(`Select a ${enType}`, `拖动选${zhType}`);
@@ -819,26 +921,45 @@ function describe(data, selected) {
   $("next").disabled = selected === pieces.length - 1;
   $("solid").setAttribute("aria-label", tr(`3D partition. The gold ${enType} spans ${interval}.`,
     `三维剖分，金色${zhType}对应区间 ${interval}。`));
-  const planarDimensions = shell ? "r = x*, h = f(x*)" : "R = f(x*)";
+  const planarDimensions = shell ? "r = x*, h = f(x*)" : shifted ? "R = 1 − √y*" : "R = f(x*)";
   $("plane").setAttribute("aria-label", tr(`Planar partition. The selected strip spans ${interval}. Its midpoint dimensions are ${planarDimensions}.`,
     `平面剖分，所选条带的区间是 ${interval}，中点处的尺寸为 ${planarDimensions}。`));
 
   const heading = document.createElement("strong");
   heading.textContent = tr(`Selected interval ${interval}`, `当前区间 ${interval}`);
-  $("piece-reading").replaceChildren(heading, tr("Thickness Δx", "厚度 Δx"));
-  $("strip-description").textContent = tr(`Revolve the midpoint rectangle outlined on the planar plot about the ${axis}-axis to form the highlighted ${enType}.`,
-    `把平面图上用虚线勾出的中点矩形绕 ${axis} 轴转一周，就得到高亮的${zhType}。`);
+  $("piece-reading").replaceChildren(heading, tr(`Thickness ${thickness}`, `厚度 ${thickness}`));
+  const around = shifted ? tr("the line x = 1","直线 x = 1") : tr(`the ${axis}-axis`,`${axis} 轴`);
+  $("strip-description").textContent = tr(`The outlined midpoint rectangle revolves about ${around} to form the highlighted ${enType}.`,
+    `平面图中虚线勾出的中点矩形绕 ${around} 转一周，得到高亮的${zhType}。`);
 
   $("piece-diagram-title").textContent = shell ? tr("Cylindrical shell","圆柱壳") : tr("Disk","圆盘");
   const diagram = $("piece-diagram");
   diagram.setAttribute("aria-label", shell
     ? tr("One cylindrical shell with radius r, height h and thickness Δx.", "圆柱壳的半径 r、壳高 h 和厚度 Δx。")
-    : tr("One solid disk with radius R and thickness Δx.", "实心圆盘的半径 R 和厚度 Δx。"));
-  drawPieceDiagram(diagram,shell);
-  describeFormulas(shell);
+    : tr(`One solid disk with ${planarDimensions} and thickness ${thickness}.`, `实心圆盘的半径 ${planarDimensions} 和厚度 ${thickness}。`));
+  drawPieceDiagram(diagram);
+  describeFormulas();
 }
 
-function describeFormulas(shell) {
+function describeFormulas() {
+  const shell = method === "shell";
+  $("shell-area").hidden = !shell;
+  if (method === "shifted") {
+    const sample = "y<sup>*</sup>";
+    const thickness = '<span class="measure-width">Δy</span>';
+    const integral = "<math><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup></math>";
+    const evaluation = "<math><msubsup><mo>]</mo><mn>0</mn><mn>1</mn></msubsup></math>";
+    $("curve-functions").innerHTML = '<span>√y ≤ x ≤ 1</span><span>0 ≤ y ≤ 1</span>';
+    $("piece-sample").innerHTML = `<span>${sample} = y + Δy/2</span>
+      <span class="measure-outer">R = 1 − √${sample}</span>`;
+    $("piece-math").innerHTML = `<span>ΔV ≈ <span class="measure-outer">πR²</span> × ${thickness}</span>
+      <span>= π(1 − √${sample})² ${thickness}</span>`;
+    $("piece-factors").textContent = tr("Horizontal strip · disk area × thickness", "水平条带 · 圆盘面积 × 厚度");
+    $("integral-math").innerHTML = `<span>dV = π(1 − √y)² dy</span>
+      <span>V = π ${integral} (1 − √y)² dy</span>
+      <span>= π [y − (4/3)y<sup>3/2</sup> + y²/2 ${evaluation} = π/6</span>`;
+    return;
+  }
   const sample = "x<sup>*</sup>";
   const thickness = '<span class="measure-width">Δx</span>';
   const integral = "<math><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup></math>";
@@ -847,7 +968,6 @@ function describeFormulas(shell) {
     ? `<span class="measure-outer">r = ${sample}</span><span class="measure-inner">h = |f(${sample})|</span>`
     : `<span class="measure-outer">R = f(${sample})</span>`;
   $("piece-sample").innerHTML = `<span>${sample} = x + Δx/2</span>${dimensions}`;
-  $("shell-area").hidden = !shell;
   if (shell) {
     $("curve-functions").innerHTML += '<span class="formula-domain">0 ≤ a &lt; b</span>';
     $("piece-math").innerHTML = `<span>ΔV ≈ <span class="measure-outer">2πr</span> × <span class="measure-inner">h</span> × ${thickness}</span>
@@ -905,21 +1025,40 @@ function goTo(index) {
 const methodButtons = document.querySelectorAll("[data-method]");
 
 function syncOptions() {
-  const shell = state.method === "shell";
+  const shell = method === "shell";
+  const shifted = method === "shifted";
   $("generating-figure-title").textContent = tr("Region in the xy plane", "xy 平面上的区域");
-  $("generating-plane").setAttribute("aria-label", tr("Region between y = f(x) and the x-axis from a to b in the xy plane.",
-    "xy 平面上，从 a 到 b、位于 y = f(x) 与 x 轴之间的区域。"));
+  $("generating-plane").setAttribute("aria-label", shifted
+    ? tr("Region under y = x² on 0 ≤ x ≤ 1. The red vertical line is x = 1.",
+      "y = x² 下方 0 ≤ x ≤ 1 的区域。红色竖线为 x = 1。")
+    : tr("Region between y = f(x) and the x-axis from a to b in the xy plane.",
+      "xy 平面上，从 a 到 b、位于 y = f(x) 与 x 轴之间的区域。"));
   $("rotation-figure-title").textContent = tr("3D rotation · grid at z = 0", "三维旋转 · 网格位于 z = 0");
-  $("generation-summary").textContent = shell
-    ? tr("Revolve the shaded region about the y-axis. The gap between x = 0 and x = a becomes the central hole.",
-      "阴影区域绕 y 轴旋转。x = 0 到 x = a 的间隔形成中央的孔。")
-    : tr("Revolve the region between y = f(x) and the x-axis about the x-axis. A vertical strip sweeps out a solid disk.",
+  const equation = shifted ? "y = x²" : "y = f(x)";
+  $("generating-curve-key").textContent = tr(`Generating curve ${equation}`,`母线 ${equation}`);
+  if (shifted) {
+    $("generation-summary").textContent = tr("Exercise 4.2. Rotate the region under y = x² on 0 ≤ x ≤ 1 about the line x = 1. The slices perpendicular to this vertical axis are horizontal.",
+      "练习 4.2。把 0 ≤ x ≤ 1 上 y = x² 下方的区域绕直线 x = 1 旋转。垂直于这条竖轴的切片是水平的。");
+    $("volume-title").textContent = tr("Exercise 4.2 · Disk method about x = 1","练习 4.2 · 圆盘法绕 x = 1");
+  } else if (shell) {
+    $("generation-summary").textContent = tr("Revolve the shaded region about the y-axis. The gap between x = 0 and x = a becomes the central hole.",
+      "阴影区域绕 y 轴旋转。x = 0 到 x = a 的间隔形成中央的孔。");
+    $("volume-title").textContent = tr("Shell method · about y","圆柱壳法 · 绕 y 轴");
+  } else {
+    $("generation-summary").textContent = tr("Revolve the region between y = f(x) and the x-axis about the x-axis. A vertical strip sweeps out a solid disk.",
       "把 y = f(x) 与 x 轴之间的区域绕 x 轴旋转。一条竖直条带扫出一个实心圆盘。");
-  $("volume-title").textContent = shell ? tr("Shell method · about y", "圆柱壳法 · 绕 y 轴") :
-    tr("Disk method · about x", "圆盘法 · 绕 x 轴");
+    $("volume-title").textContent = tr("Disk method · about x","圆盘法 · 绕 x 轴");
+  }
+  $("volume-intro").textContent = shifted
+    ? tr("At height y, the horizontal strip runs from the curve x = √y to the axis x = 1. Revolve it to see why the disk radius is 1 − √y.",
+      "在高度 y 处，水平条带从曲线 x = √y 延伸到旋转轴 x = 1。播放旋转，观察圆盘半径为什么是 1 − √y。")
+    : tr("Drag to select a vertical strip, then revolve it to see how it forms a volume piece.",
+      "拖动选中一条竖直条带，再播放旋转，观察它生成的小块。");
   $("next-method-nav").hidden = shell;
+  $("next-method").textContent = shifted ? tr("Next: Shell method →","下一节：圆柱壳法 →") :
+    tr("Next: Disk method about x = 1 →","下一节：圆盘法绕 x = 1 →");
   for (const button of methodButtons) {
-    button.setAttribute("aria-pressed", String(button.dataset.method === state.method));
+    button.setAttribute("aria-pressed", String(button.dataset.method === method));
   }
 }
 
@@ -940,12 +1079,12 @@ function showPhase(next) {
 }
 $("open-calculation").addEventListener("click", () => showPhase("volume"));
 $("back-generation").addEventListener("click", () => showPhase("generation"));
-function selectMethod(method) {
-  if (method === state.method) return;
+function selectMethod(next) {
+  if (next === method) return;
   stopPlay();
   generationSweep.reset();
   stripSweep.reset();
-  state.method = method;
+  method = next;
   syncOptions();
   if (phase === "volume") showPhase("generation");
   else render();
@@ -953,7 +1092,7 @@ function selectMethod(method) {
 for (const button of methodButtons) {
   button.addEventListener("click", () => selectMethod(button.dataset.method));
 }
-$("next-method").addEventListener("click", () => selectMethod("shell"));
+$("next-method").addEventListener("click", () => selectMethod(method === "disk" ? "shifted" : "shell"));
 $("parts").addEventListener("input", () => {
   stopPlay();
   const slider = $("piece");
@@ -978,7 +1117,6 @@ $("play").addEventListener("click", () => {
   updatePlayButton();
 });
 $("isolate").addEventListener("change", render);
-$("reset").addEventListener("click", () => { Object.assign(state, defaultView); render(); });
 
 const solid = $("solid");
 const generationCanvas = $("rotation-canvas");
@@ -1004,10 +1142,6 @@ function enableCameraDrag(canvas, camera, redraw) {
   canvas.addEventListener("lostpointercapture", () => { drag = undefined; });
 }
 
-enableCameraDrag(solid, state, () => {
-  const data = partition(Number($("parts").value));
-  drawSolid(data, Number($("piece").value) - 1);
-});
 enableCameraDrag(generationCanvas, generationCamera, generationSweep.draw);
 enableCameraDrag($("strip-canvas"),stripCamera,stripSweep.draw);
 generationCanvas.addEventListener("keydown", event => {
@@ -1027,9 +1161,11 @@ const plane = $("plane");
 plane.style.touchAction = "none";
 plane.style.cursor = "crosshair";
 function selectFromPlane(event) {
-  const {left,scale,xMin} = planeScale;
+  const {left,scale,xMin,yMax,top} = planeScale;
   const bounds = plane.getBoundingClientRect();
-  const coordinate = xMin + (event.clientX - bounds.left - left) / scale;
+  const coordinate = lessons[method].variable === "y"
+    ? yMax - (event.clientY - bounds.top - top) / scale
+    : xMin + (event.clientX - bounds.left - left) / scale;
   const data = partition(Number($("parts").value));
   goTo(Math.floor((coordinate - data.pieces[0].a) / data.step) + 1);
 }
