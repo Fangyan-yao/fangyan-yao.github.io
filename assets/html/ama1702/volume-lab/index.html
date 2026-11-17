@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Explore the disk and cylindrical shell methods with interactive 3D solids of revolution.">
+<title>Volume by Slicing · AMA1702</title>
+<style>
+:root{color-scheme:light;--ink:#17263b;--muted:#4b6077;--blue:#2254a4;--hair:#d2dce7;--paper:#eef3f8;--white:#fff;--stage:#101e32;--gold:#ffd27c;--teal:#7ee3db;--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 Inter,system-ui,-apple-system,"PingFang SC",sans-serif}
+main{width:min(1320px,100%);margin:auto;padding:21px clamp(16px,3.3vw,44px) 42px}button,select,input{font:inherit}button,select{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #2b6ac7;outline-offset:3px}
+.mast{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--hair);padding-bottom:12px}.course{font-weight:750;font-size:13px;letter-spacing:.09em}.mast-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 14px}.mast-actions span{font-size:12px;color:var(--muted)}.mast-actions button{font-size:12px;min-height:32px;padding:4px 11px}.segments button{max-width:100%}
+h1{font-size:clamp(34px,5vw,58px);letter-spacing:-.05em;line-height:1.12;margin:19px 0 8px}h2,h3,p{margin:0}h2{font-size:18px}h3{font-size:15px}.intro{color:var(--muted);max-width:70ch;margin-bottom:17px}
+.controls{display:flex;align-items:end;flex-wrap:wrap;gap:13px 20px;background:var(--white);border:1px solid var(--hair);border-radius:var(--radius);padding:10px 16px;margin-bottom:12px}
+fieldset{border:0;padding:0;margin:0;min-width:0}fieldset:disabled{opacity:.55}legend,.select-label{padding:0;display:block;color:var(--muted);font-weight:650;font-size:12px;margin-bottom:5px}.segments{display:flex;flex-wrap:wrap;gap:3px;background:#edf2f8;border:1px solid #dce5ef;border-radius:9px;padding:3px}
+button{min-height:36px;border:1px solid var(--hair);background:#fff;border-radius:8px;padding:6px 12px;color:var(--ink);font-weight:650}button:hover:not(:disabled){background:#eaf0fb}button:disabled{cursor:default}.segments button{font-size:13px;background:transparent;border-color:transparent;white-space:nowrap}.segments button[aria-pressed=true]{background:#214783;color:#fff}.segments button:disabled:not([aria-pressed=true]){color:#5b6c80}
+.grid{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(330px,1fr);gap:15px;align-items:start}.card{border-radius:var(--radius);background:var(--white);border:1px solid var(--hair);min-width:0;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;padding:14px 17px}.caption{color:var(--muted);font-size:12px}.stage{background:var(--stage);color:#fff;border-color:var(--stage)}.stage .caption{color:#a8b9cf}
+canvas{display:block;width:100%}#solid{height:clamp(300px,32vw,400px);touch-action:none;cursor:grab;background:radial-gradient(ellipse at 46% 48%,#192f4c,#101d31 77%)}#solid:active{cursor:grabbing}#plane{height:190px;background:#f7fafe}
+.region-views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#f7fafe}.region-views.solo{grid-template-columns:1fr}.region-views figure{margin:0;min-width:0}.region-views figure+figure{border-left:1px solid var(--hair)}.region-views figcaption{padding:6px 10px 0;color:var(--muted);font-size:11px;font-weight:700}#rotation-canvas{background:#f7fafe}.rotation-tools{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;padding:10px 15px 12px;font-size:12px;border-top:1px solid #e5edf5}.rotation-tools button{min-height:32px;font-size:12px}.rotation-tools output{font:650 13px ui-monospace,monospace;color:#214783}.rotation-key{display:flex;gap:6px 13px;flex:1 0 100%;flex-wrap:wrap;color:var(--muted)}.rotation-key span{display:inline-flex;align-items:center;gap:5px}.key-line{display:inline-block;width:13px;border-top:3px solid #a35710}.key-line.inner{border-top:2px dashed #15726c}.rotation-tools[hidden],.region-views [hidden]{display:none}
+.stage-controls{border-top:1px solid #293c55;padding:9px 16px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:12px;color:#d0dae9}.stage-controls label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}.stage-controls button{color:#e8f0fa;background:transparent;border-color:#45617c;min-height:31px;padding:4px 10px;margin-left:auto}.stage-controls button:hover:not(:disabled){background:#2f445f}.stage-controls input{accent-color:#ffce72}button[hidden],label[hidden]{display:none}
+.legend{display:inline-flex;gap:7px;align-items:center}.swatch{height:9px;width:9px;border-radius:3px;background:var(--gold)}.swatch.rest{background:#98b9e1}.rotation-key [hidden]{display:none}.coordinate-key{margin:0;flex-basis:100%;color:var(--muted);font-size:11px}.axis-x{color:#285cb3}.axis-y{color:#087b65}.axis-z{color:#68449d}
+.scrub{padding:10px 17px 12px;border-top:1px solid var(--hair);display:grid;gap:7px}.range-row{display:grid;grid-template-columns:1fr auto;column-gap:12px}.range-row label{font-size:13px;font-weight:700}.range-row output{font:650 13px/1.7 ui-monospace,monospace;color:#234c86}.range-row input{grid-column:1/-1;min-height:29px;width:100%;margin:0;accent-color:#2254a4;cursor:pointer}.nav-buttons{display:flex;align-items:center;gap:7px}.nav-buttons .small{min-width:39px}.nav-buttons .play{margin-left:auto}.readout{background:#f1f5fc;padding:10px 12px;border-radius:8px;font-size:13px}.readout strong{font-size:14px;display:block}
+@media(max-width:840px){.grid{grid-template-columns:1fr}#solid{height:390px}.controls{gap:10px 13px}}
+@media(max-width:510px){main{padding:15px 12px 36px}h1{margin-top:22px}#solid{height:300px}#plane{height:205px}.controls{padding:10px;gap:9px 11px}.segments button{padding:4px 8px;font-size:12px}.card-head,.scrub{padding-left:13px;padding-right:13px}.stage-controls{gap:6px 12px}}
+
+.lesson-phase[hidden],.phase-nav[hidden]{display:none}
+.phase-header{display:flex;align-items:start;justify-content:space-between;gap:14px;margin:19px 0 13px}
+.phase-header h2,#generation-title{font-size:clamp(20px,2.5vw,27px);line-height:1.2}
+.phase-header p,.generation-summary{font-size:14px;color:var(--muted);max-width:78ch}
+.phase-header p{margin-top:5px}.phase-header button{white-space:nowrap}
+.phase-nav{display:flex;justify-content:flex-end;margin-top:12px}.phase-nav .primary{background:#214783;border-color:#214783;color:white;padding:9px 16px}.phase-nav .primary:hover{background:#183766}
+.region-views canvas{height:clamp(185px,24vw,320px)}
+#rotation-canvas{touch-action:none;cursor:grab}#rotation-canvas:active{cursor:grabbing}#rotation-canvas:focus-visible{outline:3px solid #2b6ac7;outline-offset:-4px}
+.camera-hint{color:var(--muted);font-size:11px;font-weight:500;margin-left:8px}.camera-reset{margin-left:auto}.rotation-tools [hidden]{display:none}
+.region-views figcaption{padding:10px 13px 0;font-size:13px}
+.generation-summary{margin:0;padding:9px 15px 4px}.rotation-tools{border-top:0}
+#generating-plane{background:#f7fafe}
+.volume-views{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);align-items:stretch}
+.volume-views .card{display:flex;flex-direction:column}
+.volume-views .card-head{min-height:70px;align-content:center}
+.volume-views h2{font-size:16px}
+.volume-views canvas,.volume-views #solid,.volume-views #plane{height:clamp(200px,21vw,283px)}
+.volume-views #solid{flex:1 0 auto}
+.volume-views .nav-buttons{flex-wrap:wrap}
+#strip-canvas{background:#f7fafe;touch-action:none;cursor:grab}#strip-canvas:active{cursor:grabbing}
+.strip-controls{padding:11px 15px;border-top:1px solid var(--hair);display:flex;gap:9px 12px;align-items:center;flex-wrap:wrap}
+.strip-controls output{font:650 13px ui-monospace,monospace;color:#214783}
+.strip-description{padding:0 15px 12px;color:var(--muted);font-size:13px}
+.volume-views .stage-controls{margin-top:auto}
+.formula-panel{margin-top:15px;padding:16px}
+.formula-panel h2{margin-bottom:11px}
+.formula-body{display:grid;grid-template-columns:minmax(250px,1fr) minmax(0,2.3fr);gap:10px}
+.formula-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.piece-figure{margin:0;padding:10px 12px 4px;border:1px solid #e0e8f1;border-radius:9px;background:#f7fafe}
+.piece-figure figcaption{font-size:13px;font-weight:750}
+#piece-diagram{height:200px}
+.formula-step{min-width:0;padding:10px 12px 11px;border:1px solid #e0e8f1;border-radius:9px;background:#f7fafe}
+.formula-step.result{border-color:#d4e1f2;background:#eef4fc}
+.formula-step h3{font-size:12px;font-weight:750;color:var(--muted)}
+.math{display:grid;gap:3px;color:#173568;font:18px/1.45 Georgia,"STIX Two Text",serif;margin-top:6px}
+.formula-line{align-self:start}
+.math math{font-size:inherit}
+.result .math{font-size:19px}
+#shell-area[hidden]{display:none}#shell-area{font-size:16px}
+.formula-domain{font-size:14px;color:var(--muted)}
+.factors{font:650 12px/1.5 Inter,system-ui,sans-serif;color:var(--muted);margin-top:4px}
+.measure-outer{color:#a35710}.measure-inner{color:#15726c}.measure-width{color:#285cb3}
+@media(max-width:840px){.formula-body{grid-template-columns:1fr}.piece-figure canvas{max-width:360px;margin:auto}}
+@media(max-width:535px){.formula-steps{grid-template-columns:1fr}}
+@media(max-width:780px){.volume-views{grid-template-columns:1fr 1fr}.volume-views .stage{grid-column:1/-1}}
+@media(max-width:540px){.volume-views{grid-template-columns:1fr}.volume-views .stage{grid-column:auto}.volume-views .card-head{min-height:0}}
+@media(max-width:510px){.phase-header{flex-direction:column;gap:8px}.region-views canvas{height:158px}.region-views figcaption{font-size:11px;padding-inline:8px}.phase-nav .primary{width:100%}}
+</style>
+</head>
+<body>
+<main>
+<header class="mast"><span class="course">AMA1702 · CALCULUS</span><div class="mast-actions"><span data-zh="积分求体积">Volumes by integration</span><button type="button" id="language-toggle" aria-label="Switch to Chinese">中文</button></div></header>
+<h1 data-zh="体积切片实验室">Volume by Slicing</h1>
+<p class="intro" data-zh="先看立体怎样形成，再用积分求它的体积。">See how a solid is formed, then use integration to find its volume.</p>
+<div class="controls">
+  <fieldset><legend data-zh="课件顺序">Lecture sequence</legend><div class="segments">
+    <button type="button" data-method="disk" aria-pressed="true" data-zh="1. 圆盘法 · 绕 x 轴">1. Disk method · about x</button>
+    <button type="button" data-method="shell" aria-pressed="false" data-zh="2. 圆柱壳法 · 绕 y 轴">2. Shell method · about y</button>
+  </div></fieldset>
+</div>
+<section id="generation-stage" class="lesson-phase" aria-labelledby="generation-title">
+  <section class="card" aria-labelledby="generation-title">
+    <div class="card-head"><h2 id="generation-title" tabindex="-1" data-zh="生成区域">Generating region</h2><span class="caption" id="generation-caption" data-zh="计算体积之前">Before finding the volume</span></div>
+    <div class="region-views" id="region-views">
+      <figure><figcaption id="generating-figure-title">Region in the xy plane</figcaption><canvas id="generating-plane" role="img" aria-label="Generating region in the xy plane"></canvas></figure>
+      <figure id="rotation-figure"><figcaption><span id="rotation-figure-title">3D rotation · grid at z = 0</span><span class="camera-hint" id="generation-camera-hint" data-zh="拖动或用方向键转动视角">Drag or use arrow keys to orbit</span></figcaption><canvas id="rotation-canvas" role="img" tabindex="0" aria-describedby="generation-camera-hint" aria-label="The generating region revolving about the selected axis" data-zh-aria="生成区域绕所选轴旋转的示意图"></canvas></figure>
+    </div>
+    <p class="generation-summary" id="generation-summary"></p>
+    <div class="rotation-tools" id="rotation-tools">
+      <button type="button" id="rotate-demo" data-zh="播放一周旋转">Play one rotation</button>
+      <output id="rotation-angle" aria-live="off">θ = 0°</output>
+      <button type="button" class="camera-reset" id="reset-generation-view" data-zh="重置相机">Reset camera</button>
+      <div class="rotation-key"><span><i class="key-line"></i><span data-zh="母线 y = f(x)">Generating curve y = f(x)</span></span></div>
+      <p class="coordinate-key"><b class="axis-x">x</b><span data-zh="、"> and </span><b class="axis-y">y</b><span data-zh=" 轴与左图同色。"> match the left diagram. </span><b class="axis-z">z</b><span data-zh=" 轴垂直于左图平面。两张图的 P₀ 对应母线上的同一点。"> is perpendicular to that plane. P₀ marks the same point on the curve in both diagrams.</span></p>
+    </div>
+  </section>
+  <div class="phase-nav">
+    <button type="button" class="primary" id="open-calculation" data-zh="下一步：计算体积 →">Next: Calculate the volume →</button>
+  </div>
+</section>
+<section id="volume-stage" class="lesson-phase" aria-labelledby="volume-title" hidden>
+  <div class="phase-header">
+    <div><h2 id="volume-title" tabindex="-1" data-zh="计算体积">Calculate the volume</h2>
+    <p data-zh="拖动选中一条竖直条带，再播放旋转，观察它生成的小块。">Drag to select a vertical strip, then revolve it to see how it forms a volume piece.</p></div>
+    <button type="button" id="back-generation" data-zh="← 返回看立体的生成">← Back to the generating region</button>
+  </div>
+<div class="grid volume-views">
+  <section class="card stage" aria-labelledby="solid-title">
+    <div class="card-head"><h2 id="solid-title" data-zh="三维剖分">3D partition</h2><span class="caption" data-zh="在图上拖动可旋转视角">Drag to rotate the view</span></div>
+    <canvas id="solid" role="img" aria-label="3D view of the selected volume element" data-zh-aria="当前选中体积小块的三维视图"></canvas>
+    <div class="stage-controls">
+      <span class="legend"><span class="swatch"></span><span data-zh="当前小块">Selected piece</span></span>
+      <span class="legend"><span class="swatch rest"></span><span data-zh="其余剖分">Other pieces</span></span>
+      <label><input id="isolate" type="checkbox"><span data-zh="只看当前小块">Show only the selected piece</span></label>
+      <button type="button" id="reset" data-zh="重置视角">Reset view</button>
+    </div>
+  </section>
+  <section class="card" aria-labelledby="plane-title">
+    <div class="card-head"><h2 id="plane-title">Planar partition</h2><span class="caption" id="plane-caption">xy plane · drag to select</span></div>
+    <canvas id="plane" role="img" aria-label="Planar partition and selected strip"></canvas>
+    <div class="scrub">
+      <div class="range-row"><label for="parts" data-zh="剖分数 n">Number of pieces n</label><output id="parts-value" for="parts"></output><input id="parts" type="range" min="2" max="24" value="6" step="1"></div>
+      <div class="range-row"><label for="piece" id="piece-label" data-zh="拖动选圆盘">Select a disk</label><output id="piece-value" for="piece"></output><input id="piece" type="range" min="1" max="6" value="3" step="1"></div>
+      <div class="nav-buttons"><button class="small" type="button" id="previous" aria-label="Previous piece" data-zh-aria="上一个小块">←</button><button class="small" type="button" id="next" aria-label="Next piece" data-zh-aria="下一个小块">→</button><button class="play" type="button" id="play" aria-pressed="false" data-zh="自动遍历">Play through pieces</button></div>
+      <p class="readout" id="piece-reading" aria-live="polite"></p>
+    </div>
+  </section>
+  <section class="card" aria-labelledby="strip-title">
+    <div class="card-head"><h2 id="strip-title" data-zh="高亮条带的旋转">Revolve the selected strip</h2><span class="caption" data-zh="拖动转动视角">Drag to orbit</span></div>
+    <canvas id="strip-canvas" role="img" aria-label="Rotation of the selected strip"></canvas>
+    <div class="strip-controls"><button type="button" id="strip-play" data-zh="旋转当前条带">Revolve strip</button><output id="strip-angle" aria-live="off">θ = 0°</output></div>
+    <p class="strip-description" id="strip-description"></p>
+  </section>
+</div>
+<section class="card formula-panel" aria-labelledby="calculation-title">
+  <h2 id="calculation-title" data-zh="从母线到体积">From curves to volume</h2>
+  <div class="formula-body">
+  <figure class="piece-figure">
+    <figcaption id="piece-diagram-title"></figcaption>
+    <canvas id="piece-diagram" role="img" aria-label="Dimensions of one thin piece"></canvas>
+  </figure>
+  <div class="formula-steps">
+    <div class="formula-step">
+      <h3 data-zh="区域的两条边界">Region boundaries</h3>
+      <div class="math" id="curve-functions"></div>
+    </div>
+    <div class="formula-step">
+      <h3 data-zh="中点处的尺寸">Dimensions at the midpoint</h3>
+      <div class="math" id="piece-sample"></div>
+    </div>
+    <div class="formula-step result">
+      <h3 data-zh="一片的近似体积">One piece</h3>
+      <div class="math" id="shell-area" hidden></div>
+      <div class="math" id="piece-math"></div>
+      <p class="factors" id="piece-factors"></p>
+    </div>
+    <div class="formula-step result">
+      <h3 data-zh="总体积">Total volume</h3>
+      <div class="math" id="integral-math"></div>
+    </div>
+  </div>
+  </div>
+</section>
+<div class="phase-nav" id="next-method-nav"><button type="button" class="primary" id="next-method" data-zh="下一节：圆柱壳法 →">Next: Shell method →</button></div>
+</section>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let language = new URLSearchParams(location.search).get("lang") === "zh" ? "zh" : "en";
+const tr = (en, zh) => language === "zh" ? zh : en;
+const staticText = Array.from(document.querySelectorAll("[data-zh]"), node => [node, node.textContent, node.dataset.zh]);
+const staticLabels = Array.from(document.querySelectorAll("[data-zh-aria]"), node => [node, node.getAttribute("aria-label"), node.dataset.zhAria]);
+
+const PI = Math.PI;
+const defaultView = { yaw: 0.83, pitch: 0.44 };
+const defaultGenerationView = { yaw: 0.91, pitch: 0.46 };
+const generationCamera = { ...defaultGenerationView };
+const state = {
+  method: "disk",
+  get axis() { return this.method === "disk" ? "x" : "y"; },
+  ...defaultView,
+};
+let phase = "generation";
+const midpoint = (a, b) => (a + b) / 2;
+
+const [domainStart, domainEnd] = [1, 5];
+const heightAt = x => 1 + 2 * ((x - domainStart) / (domainEnd - domainStart)) ** 2;
+const curve = Array.from({length:33}, (_,i) => {
+  const x = domainStart + (domainEnd - domainStart) * i / 32;
+  return [x,heightAt(x)];
+});
+const region = [[domainStart,0], ...curve, [domainEnd,0]];
+
+function partition(n) {
+  const step = (domainEnd - domainStart) / n;
+  const pieces = Array.from({length:n}, (_,i) => {
+    const a = domainStart + i * step;
+    const b = a + step;
+    const m = midpoint(a,b);
+    const height = heightAt(m);
+    const mesh = state.method === "disk" ? [a,b,0,height] : [0,height,a,b];
+    return {a,b,m,height,mesh};
+  });
+  return {step,pieces};
+}
+
+function prepareCanvas(canvas) {
+  const { width, height } = canvas.getBoundingClientRect();
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const pixelWidth = Math.round(width * ratio);
+  const pixelHeight = Math.round(height * ratio);
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+  }
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  return { ctx, width, height };
+}
+
+function path(ctx, points, closed = false) {
+  ctx.beginPath();
+  points.forEach(([x, y], index) => {
+    if (index) ctx.lineTo(x, y);
+    else ctx.moveTo(x, y);
+  });
+  if (closed) ctx.closePath();
+}
+
+function dot(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+function radialPoint(axis, t, r, angle) {
+  const c = r * Math.cos(angle);
+  const s = r * Math.sin(angle);
+  return axis === "x" ? [t, c, s] : [c, t, -s];
+}
+
+const generatorStyle = { outer: "#a35710", inner: "#15726c" };
+const coordinateColors = { x: "#285cb3", y: "#087b65", z: "#68449d" };
+
+function axisArrow(ctx, from, to, name, active) {
+  const direction = Math.atan2(to[1] - from[1], to[0] - from[0]);
+  const wing = angle => [to[0] - 6 * Math.cos(angle), to[1] - 6 * Math.sin(angle)];
+  ctx.strokeStyle = coordinateColors[name];
+  ctx.fillStyle = coordinateColors[name];
+  ctx.lineWidth = active ? 2.2 : 1.25;
+  path(ctx, [from, to]);
+  ctx.stroke();
+  path(ctx, [to, wing(direction - .44), wing(direction + .44)], true);
+  ctx.fill();
+  ctx.font = "700 12px system-ui";
+  const leftward = name === "z";
+  const labelX = leftward ? to[0] - 10 : to[0] + 5;
+  const scale = ctx.getTransform().a;
+  const width = ctx.canvas.width / scale;
+  const height = ctx.canvas.height / scale;
+  const labelY = to[1] + (name === "y" ? -1 : 4);
+  ctx.fillText(name,Math.max(2,Math.min(width - 12,labelX)),Math.max(13,Math.min(height - 4,labelY)));
+}
+
+function markedPoint(ctx, point, label, color, dx = 6, dy = -6) {
+  const [x,y] = point;
+  ctx.beginPath();
+  ctx.arc(x,y,3.4,0,2*PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 1.25;
+  ctx.strokeStyle = "#fff";
+  ctx.stroke();
+  ctx.font = "700 11px system-ui";
+  ctx.lineWidth = 2.5;
+  ctx.strokeText(label,x + dx,y + dy);
+  ctx.fillText(label,x + dx,y + dy);
+}
+
+function labelInterval(ctx, from, to, variable) {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const horizontal = Math.abs(dx) >= Math.abs(dy);
+  const direction = (horizontal ? dx : dy) >= 0 ? 1 : -1;
+  const labels = [variable, variable + " + Δ" + variable];
+  [from,to].forEach(([x,y], index) => {
+    const side = direction * (index === 0 ? -1 : 1);
+    const shiftX = horizontal ? 5 * side : -6;
+    const shiftY = horizontal ? -7 : 8 * side;
+    ctx.save();
+    ctx.font = "700 11px system-ui";
+    ctx.textAlign = horizontal && side > 0 ? "left" : "right";
+    ctx.textBaseline = horizontal ? "alphabetic" : "middle";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#fff";
+    const pixelsWide = ctx.canvas.width / ctx.getTransform().a;
+    const labelWidth = ctx.measureText(labels[index]).width;
+    const start = ctx.textAlign === "left" ? 2 : labelWidth + 2;
+    const end = ctx.textAlign === "left" ? pixelsWide - labelWidth - 2 : pixelsWide - 2;
+    const tx = Math.max(start, Math.min(end,x + shiftX));
+    ctx.strokeText(labels[index], tx, y + shiftY);
+    ctx.fillStyle = "#8c480c";
+    ctx.fillText(labels[index], tx, y + shiftY);
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(x,y,2.3,0,2*PI);
+    ctx.fillStyle = "#9b5110";
+    ctx.fill();
+  });
+}
+
+function dimensionLine(ctx, from, to, color, weight = 1.5) {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const length = Math.hypot(dx, dy);
+  if (!length) return;
+  const nx = -dy / length * 3;
+  const ny = dx / length * 3;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = weight;
+  path(ctx, [from, to]);
+  ctx.stroke();
+  for (const [x,y] of [from,to]) {
+    path(ctx, [[x - nx,y - ny],[x + nx,y + ny]]);
+    ctx.stroke();
+  }
+}
+
+function drawPlanarDimensions(ctx, toPixel, piece, width) {
+  const shell = state.method === "shell";
+  const [x,base] = toPixel([piece.m,0]);
+  const high = toPixel([piece.m,piece.height]);
+  const radiusColor = generatorStyle.outer;
+  const heightColor = shell ? generatorStyle.inner : radiusColor;
+  dimensionLine(ctx,[x + 6,base],[x + 6,high[1]],heightColor);
+
+  const label = shell ? "h = f(x*)" : "R = f(x*)";
+  ctx.font = "700 11px system-ui";
+  const labelWidth = ctx.measureText(label).width;
+  const dx = x + labelWidth + 9 > width ? -labelWidth - 8 : 8;
+  const dy = high[1] < 64 ? 15 : -9;
+  markedPoint(ctx,high,label,heightColor,dx,dy);
+  if (shell) {
+    const [origin] = toPixel([0,0]);
+    dimensionLine(ctx,[origin,base + 25],[x,base + 25],radiusColor);
+    ctx.font = "700 11px system-ui";
+    ctx.fillStyle = radiusColor;
+    ctx.fillText("r = x*",midpoint(origin,x) - 15,base + 39);
+  }
+}
+
+function projection(width, height, unit, center, {yaw,pitch}) {
+  const across = [Math.cos(yaw),0,-Math.sin(yaw)];
+  const up = [-Math.sin(yaw) * Math.sin(pitch),Math.cos(pitch),-Math.cos(yaw) * Math.sin(pitch)];
+  const toward = [Math.sin(yaw) * Math.cos(pitch),Math.sin(pitch),Math.cos(yaw) * Math.cos(pitch)];
+  return point => {
+    const relative = point.map((coordinate,i) => coordinate - center[i]);
+    return [width / 2 + unit * dot(relative,across), height / 2 - unit * dot(relative,up), dot(relative,toward)];
+  };
+}
+
+function drawSolid(data, selected) {
+  const { ctx, width, height } = prepareCanvas($("solid"));
+  if (!width || !height) return;
+  const {axis} = state;
+  const isolate = $("isolate").checked;
+  const center = axis === "x" ? [3,0,0] : [0,1.4,0];
+  const unit = Math.min((width - 36) / (axis === "x" ? 8.3 : 11), (height - 36) / 7.5);
+  const project = projection(width,height,unit,center,state);
+
+  ctx.fillStyle = "#ffffff0b";
+  for (let x = 16; x < width; x += 24) for (let y = 12; y < height; y += 24) ctx.fillRect(x, y, 1.5, 1.5);
+  const faces = [];
+  const edges = [];
+  function face(vertices, active, material) {
+    const points = vertices.map(project);
+    faces.push({ points, depth: points.reduce((sum, point) => sum + point[2], 0) / points.length, active, material });
+  }
+  function edge(vertices, active, closed = false) {
+    edges.push({ points: vertices.map(project), active, closed });
+  }
+
+  const steps = 40;
+  const angles = Array.from({ length: steps + 1 }, (_, i) => i * 2 * PI / steps);
+  const arc = (t, r) => angles.map(angle => radialPoint(axis, t, r, angle));
+  data.pieces.forEach((piece, i) => {
+    const active = i === selected;
+    if (isolate && !active) return;
+    const [a, b, inner, outer] = piece.mesh;
+    const innerA = arc(a, inner);
+    const innerB = arc(b, inner);
+    const outerA = arc(a, outer);
+    const outerB = arc(b, outer);
+    for (let j = 0; j < steps; j++) {
+      const k = j + 1;
+      face([outerA[j], outerA[k], outerB[k], outerB[j]], active, "outer");
+      if (inner > 0) face([innerA[j], innerA[k], innerB[k], innerB[j]], active, "inner");
+      face([innerA[j], outerA[j], outerA[k], innerA[k]], active, "cap");
+      face([innerB[j], outerB[j], outerB[k], innerB[k]], active, "cap");
+    }
+    edge(outerA, active);
+    edge(outerB, active);
+    if (inner > 0) {
+      edge(innerA, active);
+      edge(innerB, active);
+    }
+  });
+
+  const back = { cap: "#83acd831", outer: "#7cabe347", inner: "#628dca26" };
+  const gold = { cap: "#ffd480bc", outer: "#e7a746b8", inner: "#f0b551ac" };
+  faces.sort((a,b) => a.depth - b.depth);
+  // Draw the selected piece above the translucent context so hidden slices remain readable.
+  for (const active of [false,true]) {
+    for (const face of faces) {
+      if (face.active !== active) continue;
+      path(ctx,face.points,true);
+      ctx.fillStyle = (active ? gold : back)[face.material];
+      ctx.fill();
+    }
+    for (const edge of edges) {
+      if (edge.active !== active) continue;
+      ctx.lineWidth = active ? 1.6 : 1;
+      ctx.strokeStyle = active ? "#ffe1a4" : "#a1c3ef98";
+      path(ctx,edge.points,edge.closed);
+      ctx.stroke();
+    }
+  }
+
+  const axisPoint = (name, t) => name === "x" ? [t,0,0] : [0,t,0];
+  ctx.font = "700 13px system-ui";
+  for (const name of ["x", "y"]) {
+    const primary = name === axis;
+    const a = project(axisPoint(name, -0.58));
+    const b = project(axisPoint(name, name === "x" ? 5.7 : 3.85));
+    ctx.strokeStyle = primary ? "#83eee2" : "#a9b5c8";
+    ctx.lineWidth = primary ? 1.45 : 1;
+    ctx.setLineDash(primary ? [5, 5] : [2, 5]);
+    path(ctx, [a, b]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
+    path(ctx, [b, [b[0] - 8 * Math.cos(angle - .4), b[1] - 8 * Math.sin(angle - .4)], [b[0] - 8 * Math.cos(angle + .4), b[1] - 8 * Math.sin(angle + .4)]], true);
+    ctx.fillStyle = primary ? "#a7fff1" : "#ccd7e6";
+    ctx.fill();
+    ctx.fillText(name, Math.max(5, Math.min(width - 13, b[0] + 7)), Math.max(13, Math.min(height - 5, b[1] + 4)));
+  }
+  ctx.fillStyle = "#becfe4";
+  ctx.font = "12px system-ui";
+  ctx.fillText(tr("Full 360°", "完整 360°"), 13, height - 11);
+}
+
+function drawPlane(canvas, data = null, selected = 0) {
+  const {ctx,width,height} = prepareCanvas(canvas);
+  const xMin = -.4;
+  const xMax = 5.7;
+  const yMin = -.4;
+  const yMax = 3.65;
+  const scale = Math.min((width - 45) / (xMax - xMin), (height - 59) / (yMax - yMin));
+  const left = (width - scale * (xMax - xMin)) / 2;
+  const top = 17;
+  const toPixel = ([x,y]) => [left + (x - xMin) * scale, top + (yMax - y) * scale];
+  function plotLine(from,to) {
+    path(ctx,[toPixel(from),toPixel(to)]);
+    ctx.stroke();
+  }
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#dce6f1";
+  for (let x = 0; x < xMax; x++) plotLine([x,yMin],[x,yMax]);
+  for (let y = 0; y < yMax; y++) plotLine([xMin,y],[xMax,y]);
+
+  path(ctx,region.map(toPixel),true);
+  ctx.fillStyle = "#dce9f8";
+  ctx.fill();
+  const piece = data?.pieces[selected];
+  if (piece) {
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = "#7292ba";
+    ctx.lineWidth = .7;
+    for (const {b} of data.pieces) plotLine([b,yMin],[b,yMax]);
+    const from = toPixel([piece.a,yMax]);
+    const to = toPixel([piece.b,yMin]);
+    ctx.fillStyle = "#f4ad34a8";
+    ctx.fillRect(from[0],from[1],to[0] - from[0],to[1] - from[1]);
+    ctx.restore();
+
+    const corners = [[piece.a,0],[piece.b,0],[piece.b,piece.height],[piece.a,piece.height]];
+    path(ctx,corners.map(toPixel),true);
+    ctx.strokeStyle = "#9e570c";
+    ctx.lineWidth = 1.25;
+    ctx.setLineDash([3,2]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  path(ctx,region.map(toPixel),true);
+  ctx.strokeStyle = "#3e618d";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  path(ctx,curve.map(toPixel));
+  ctx.strokeStyle = generatorStyle.outer;
+  ctx.lineWidth = 2.8;
+  ctx.stroke();
+
+  axisArrow(ctx,toPixel([xMin,0]),toPixel([xMax,0]),"x",state.axis === "x");
+  axisArrow(ctx,toPixel([0,yMin]),toPixel([0,yMax]),"y",state.axis === "y");
+  ctx.fillStyle = "#4d6887";
+  ctx.font = "italic 13px Georgia";
+  for (const [x,label] of [[domainStart,"a"],[domainEnd,"b"]]) {
+    const [px,py] = toPixel([x,0]);
+    ctx.fillText(label,px - 3,py + 15);
+  }
+  markedPoint(ctx,toPixel([0,0]),"O","#334e6d",-12,13);
+
+  if (piece) {
+    const ends = [[piece.a,3.25],[piece.b,3.25]].map(toPixel);
+    ctx.strokeStyle = "#a65a0d";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    for (const x of [piece.a,piece.b]) plotLine([x,0],[x,3.25]);
+    ctx.setLineDash([]);
+    path(ctx,ends);
+    ctx.stroke();
+    labelInterval(ctx,...ends,"x");
+    drawPlanarDimensions(ctx,toPixel,piece,width);
+  } else {
+    const middle = midpoint(domainStart,domainEnd);
+    markedPoint(ctx,toPixel([middle,heightAt(middle)]),"P₀",generatorStyle.outer,6,14);
+    const [px,py] = toPixel([2.3,1.95]);
+    ctx.fillStyle = generatorStyle.outer;
+    ctx.font = "italic 15px Georgia";
+    ctx.fillText("y = f(x)",px - 20,py);
+  }
+  return {scale,xMin,left};
+}
+
+function drawSweep(canvas, camera, rotationAngle, strip = null) {
+  const { ctx, width, height } = prepareCanvas(canvas);
+  if (!width || !height) return;
+  const {axis} = state;
+  const center = axis === "x" ? [3,.35,0] : [0,1.4,0];
+  const unit = Math.min((width - 24) / (axis === "x" ? 9.3 : 11), (height - 24) / (axis === "x" ? 7.9 : 8.2));
+  const project = projection(width,height,unit,center,camera);
+  const pointAt = (t,r,angle) => project(radialPoint(axis,t,r,angle));
+  const axialRadial = ([x,y]) => axis === "x" ? [x,y] : [y,x];
+  const [a,b,inner,outer] = strip?.mesh ?? [];
+  const stripCorners = [[a,inner],[a,outer],[b,outer],[b,inner]];
+  const polygon = strip ? stripCorners : region.map(axialRadial);
+  const planeAt = angle => polygon.map(([t,r]) => pointAt(t,r,angle));
+
+  const lines = strip ? [
+    {role:"outer",samples:[[a,outer],[b,outer]]},
+    ...(inner > 0 ? [{role:"inner",samples:[[a,inner],[b,inner]]}] : []),
+  ] : [{role:"outer",samples:curve.map(axialRadial)}];
+  const endFaces = strip
+    ? [a,b].map(t => ({role:"end",samples:[[t,inner],[t,outer]]}))
+    : [[region[0],curve[0]],[curve.at(-1),region.at(-1)],[region.at(-1),region[0]]]
+      .map(points => ({role:"end",samples:points.map(axialRadial)}));
+  function stroke(points, color, width = 1, dash = []) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash);
+    path(ctx, points);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function plate(angle, fill, outline) {
+    path(ctx, planeAt(angle), true);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // The reference grid is the xy plane from the left diagram.
+  for (let x = 0; x <= 5; x++) stroke([[x,0,0],[x,3.25,0]].map(project), "#c9d9e9", .8);
+  for (let y = 0; y <= 3; y++) stroke([[0,y,0],[5.25,y,0]].map(project), "#c9d9e9", .8);
+
+  const steps = Math.max(1, Math.ceil(rotationAngle / oneTurn * 42));
+  const angles = Array.from({ length: steps + 1 }, (_, i) => rotationAngle * i / steps);
+  const surface = [];
+  for (const {role,samples} of [...lines, ...endFaces]) {
+    const rings = samples.map(([t,r]) => angles.map(angle => pointAt(t,r,angle)));
+    for (let j = 1; j < rings.length; j++) {
+      const lower = rings[j - 1], upper = rings[j];
+      for (let i = 0; i < steps; i++) {
+        const points = [lower[i],upper[i],upper[i + 1],lower[i + 1]];
+        const depth = points.reduce((sum,p) => sum + p[2], 0) / points.length;
+        surface.push({points,depth,role});
+      }
+    }
+  }
+  surface.sort((a,b) => a.depth - b.depth);
+  for (const face of surface) {
+    path(ctx, face.points, true);
+    if (strip) ctx.fillStyle = face.role === "end" ? "#e7b96560" : "#dda0445e";
+    else ctx.fillStyle = face.role === "outer" ? "#dca7543c" : face.role === "inner" ? "#3cafa63a" : "#7e9bb32a";
+    ctx.fill();
+  }
+  for (const line of lines) {
+    for (const [t,r] of [line.samples[0],line.samples.at(-1)]) {
+      stroke(angles.map(angle => pointAt(t,r,angle)), strip || line.role === "outer" ? "#bb86499e" : "#4c99958f");
+    }
+  }
+
+  plate(0, strip ? "#efc78065" : "#82afe559", strip ? "#ae6c2f" : "#608bb4");
+  plate(rotationAngle, "#ecc87d40", "#a7773c");
+  for (const line of lines) {
+    const dash = line.role === "inner" ? [4, 2] : [];
+    const color = strip ? generatorStyle.outer : generatorStyle[line.role];
+    stroke(line.samples.map(p => pointAt(...p,0)), color + "86", 1.3, [3, 3]);
+    stroke(line.samples.map(p => pointAt(...p,rotationAngle)), color, 2.5, dash);
+  }
+
+  const origin = project([0,0,0]);
+  const directions = {x:[5.6,0,0],y:[0,3.72,0],z:[0,0,3.35]};
+  for (const [name,tip] of Object.entries(directions)) {
+    axisArrow(ctx,origin,project(tip),name,axis === name);
+  }
+  stroke([origin,project([0,0,-2.5])],coordinateColors.z + "66",.9,[4,3]);
+  markedPoint(ctx,origin,"O","#334e6d",4,-5);
+
+  if (strip) {
+    const axial = axis === "x";
+    const ends = (axial ? [[a,outer],[b,outer]] : [[b,inner],[b,outer]])
+      .map(p => pointAt(...p,rotationAngle));
+    stroke(ends, "#9b5110", 1.7);
+    labelInterval(ctx,...ends,"x");
+  } else {
+    const middle = midpoint(domainStart,domainEnd);
+    const [t,radius] = axialRadial([middle,heightAt(middle)]);
+    stroke(angles.map(angle => pointAt(t,radius,angle)), generatorStyle.outer + "99", 1.3, [4,3]);
+    const start = pointAt(t,radius,0);
+    const marker = pointAt(t,radius,rotationAngle);
+    if (rotationAngle > .22 && rotationAngle < oneTurn - .02) {
+      const previous = pointAt(t,radius,rotationAngle - .12);
+      const direction = Math.atan2(marker[1] - previous[1], marker[0] - previous[0]);
+      const wing = angle => [marker[0] - 7 * Math.cos(angle), marker[1] - 7 * Math.sin(angle)];
+      stroke([wing(direction - .5), marker, wing(direction + .5)], generatorStyle.outer, 1.7);
+    }
+    const startLabelX = start[0] > width - 30 ? -18 : 6;
+    markedPoint(ctx,start,"P₀",generatorStyle.outer,startLabelX,-6);
+    if (Math.hypot(marker[0] - start[0], marker[1] - start[1]) > 12) {
+      const markerLabelX = marker[0] > width - 30 ? -18 : 6;
+      markedPoint(ctx,marker,"Pθ",generatorStyle.outer,markerLabelX,13);
+    }
+  }
+
+  const angle = Math.round(rotationAngle * 180 / PI);
+  $(strip ? "strip-angle" : "rotation-angle").value = "θ = " + angle + "°";
+  if (strip) {
+    canvas.setAttribute("aria-label", tr(`The selected strip from x to x plus delta x, rotated ${angle} degrees about the ${axis}-axis.`,
+      `从 x 到 x + Δx 的高亮条带，绕 ${axis} 轴旋转 ${angle} 度。`));
+    return;
+  }
+  canvas.setAttribute("aria-label", tr(
+    `The x, y and z axes and the reference grid at z = 0. P₀ rotates ${angle} degrees about the ${axis}-axis to reach Pθ.`,
+    `三维 x、y、z 坐标轴和 z = 0 的参考网格。母线上的 P₀ 绕 ${axis} 轴旋转 ${angle} 度到达 Pθ。`
+  ));
+}
+
+const oneTurn = 2 * PI;
+const stripCamera = { ...defaultGenerationView };
+let selectedStrip;
+
+function drawPieceDiagram(canvas, shell) {
+  const {ctx,width,height} = prepareCanvas(canvas);
+  if (!width || !height) return;
+  const scale = Math.min(width / 286, height / 190);
+  ctx.save();
+  ctx.translate((width - 286 * scale) / 2, (height - 190 * scale) / 2);
+  ctx.scale(scale,scale);
+
+  const cx = 126;
+  const y = shell ? 56 : 77;
+  const outer = 83;
+  const inner = shell ? 70 : 0;
+  const depth = shell ? 87 : 20;
+  const tilt = .31;
+  const outerColor = generatorStyle.outer;
+  const innerColor = generatorStyle.inner;
+  const widthColor = coordinateColors.x;
+  const thickness = "Δx";
+  const farSide = cx + outer;
+  const lowerY = y + depth;
+
+  // The front wall joins the lower halves of the two outer ellipses.
+  ctx.beginPath();
+  ctx.ellipse(cx,y,outer,outer * tilt,0,PI,0,true);
+  ctx.lineTo(farSide,lowerY);
+  ctx.ellipse(cx,lowerY,outer,outer * tilt,0,0,PI);
+  ctx.closePath();
+  ctx.fillStyle = "#e6b878";
+  ctx.strokeStyle = "#a06f37";
+  ctx.lineWidth = 1.3;
+  ctx.fill();
+  ctx.stroke();
+
+  // Reveal the inside of the hole through the upper annulus.
+  if (inner) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx,y,inner,inner * tilt,0,0,2 * PI);
+    ctx.clip();
+    const innerWall = ctx.createLinearGradient(0,y - inner * tilt,0,y + inner * tilt);
+    innerWall.addColorStop(0,"#aa8255");
+    innerWall.addColorStop(1,"#69513c");
+    ctx.fillStyle = innerWall;
+    ctx.fillRect(cx - inner,y - inner * tilt,inner * 2,inner * tilt * 2);
+    ctx.beginPath();
+    ctx.ellipse(cx,lowerY,inner,inner * tilt,0,0,2 * PI);
+    ctx.fillStyle = "#f7fafe";
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.ellipse(cx,y,outer,outer * tilt,0,0,2 * PI);
+  if (inner) {
+    ctx.moveTo(cx + inner,y);
+    ctx.ellipse(cx,y,inner,inner * tilt,0,0,2 * PI);
+  }
+  ctx.fillStyle = "#ffebc5";
+  ctx.fill("evenodd");
+  ctx.strokeStyle = "#a06f37";
+  ctx.stroke();
+
+  function measure(from, to, label, labelX, labelY, color) {
+    dimensionLine(ctx,from,to,color);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "#f7fafe";
+    ctx.lineWidth = 3;
+    ctx.font = "700 14px system-ui";
+    ctx.strokeText(label,labelX,labelY);
+    ctx.fillText(label,labelX,labelY);
+  }
+  if (shell) {
+    const middleRadius = (inner + outer) / 2;
+    dimensionLine(ctx,[cx,y],[cx + middleRadius,y],"#ffebc5",3.5);
+    measure([cx,y],[cx + middleRadius,y],"r",cx + 36,y - 8,outerColor);
+    measure([farSide + 20,y],[farSide + 20,lowerY],"h",farSide + 29,y + depth / 2 + 4,innerColor);
+    measure([cx - outer,y],[cx - inner,y],thickness,cx - outer - 3,y - 13,widthColor);
+  } else {
+    measure([cx,y],[cx + outer,y],"R",cx + 41,y - 8,outerColor);
+    measure([farSide + 20,y],[farSide + 20,lowerY],thickness,farSide + 29,y + 15,widthColor);
+  }
+  ctx.strokeStyle = shell ? "#15726c70" : "#285cb370";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2,2]);
+  for (const edge of [y,lowerY]) {
+    path(ctx, [[farSide,edge],[farSide + 17,edge]]);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function makeSweep(button, redraw, isStrip) {
+  let angle = 0;
+  let frame = null;
+  let previousTime = null;
+  function updateButton() {
+    if (frame !== null) button.textContent = tr("Pause rotation", "暂停旋转");
+    else if (angle >= oneTurn) button.textContent = isStrip ? tr("Replay strip", "重播条带") : tr("Replay one rotation", "重播一周旋转");
+    else if (angle > 0) button.textContent = tr("Resume rotation", "继续旋转");
+    else button.textContent = isStrip ? tr("Revolve strip", "旋转当前条带") : tr("Play one rotation", "播放一周旋转");
+  }
+  function pause() {
+    if (frame !== null) cancelAnimationFrame(frame);
+    frame = null;
+    previousTime = null;
+    updateButton();
+  }
+  function reset() {
+    angle = 0;
+    pause();
+  }
+  function animate(time) {
+    if (previousTime !== null) angle = Math.min(oneTurn, angle + (time - previousTime) / 4400 * oneTurn);
+    previousTime = time;
+    redraw(angle);
+    if (angle < oneTurn) frame = requestAnimationFrame(animate);
+    else pause();
+  }
+  button.addEventListener("click", () => {
+    if (isStrip) stopPlay();
+    if (frame !== null) return pause();
+    if (angle >= oneTurn) angle = 0;
+    redraw(angle);
+    frame = requestAnimationFrame(animate);
+    updateButton();
+  });
+  return {draw: () => redraw(angle), pause, reset, updateButton};
+}
+
+const generationSweep = makeSweep($("rotate-demo"),
+  angle => drawSweep($("rotation-canvas"),generationCamera,angle), false);
+const stripSweep = makeSweep($("strip-play"),
+  angle => { if (selectedStrip) drawSweep($("strip-canvas"),stripCamera,angle,selectedStrip); }, true);
+
+function describe(data, selected) {
+  const {axis,method} = state;
+  const shell = method === "shell";
+  const {pieces} = data;
+  const [enType,zhType] = shell ? ["shell","圆柱壳"] : ["disk","圆盘"];
+  const index = selected + 1;
+  const interval = "[x, x + Δx]";
+  $("plane-title").textContent = tr("Planar partition", "平面剖分");
+  $("plane-caption").textContent = tr("xy plane · drag to select", "xy 平面 · 可拖动");
+  $("piece-label").textContent = tr(`Select a ${enType}`, `拖动选${zhType}`);
+  $("parts-value").value = String(pieces.length);
+  $("piece-value").value = index + " / " + pieces.length;
+  $("piece").setAttribute("aria-valuetext", tr(`${enType} ${index} of ${pieces.length}`, `第 ${index} 个${zhType}，共 ${pieces.length} 个`));
+  $("previous").disabled = selected === 0;
+  $("next").disabled = selected === pieces.length - 1;
+  $("solid").setAttribute("aria-label", tr(`3D partition. The gold ${enType} spans ${interval}.`,
+    `三维剖分，金色${zhType}对应区间 ${interval}。`));
+  const planarDimensions = shell ? "r = x*, h = f(x*)" : "R = f(x*)";
+  $("plane").setAttribute("aria-label", tr(`Planar partition. The selected strip spans ${interval}. Its midpoint dimensions are ${planarDimensions}.`,
+    `平面剖分，所选条带的区间是 ${interval}，中点处的尺寸为 ${planarDimensions}。`));
+
+  const heading = document.createElement("strong");
+  heading.textContent = tr(`Selected interval ${interval}`, `当前区间 ${interval}`);
+  $("piece-reading").replaceChildren(heading, tr("Thickness Δx", "厚度 Δx"));
+  $("strip-description").textContent = tr(`Revolve the midpoint rectangle outlined on the planar plot about the ${axis}-axis to form the highlighted ${enType}.`,
+    `把平面图上用虚线勾出的中点矩形绕 ${axis} 轴转一周，就得到高亮的${zhType}。`);
+
+  $("piece-diagram-title").textContent = shell ? tr("Cylindrical shell","圆柱壳") : tr("Disk","圆盘");
+  const diagram = $("piece-diagram");
+  diagram.setAttribute("aria-label", shell
+    ? tr("One cylindrical shell with radius r, height h and thickness Δx.", "圆柱壳的半径 r、壳高 h 和厚度 Δx。")
+    : tr("One solid disk with radius R and thickness Δx.", "实心圆盘的半径 R 和厚度 Δx。"));
+  drawPieceDiagram(diagram,shell);
+  describeFormulas(shell);
+}
+
+function describeFormulas(shell) {
+  const sample = "x<sup>*</sup>";
+  const thickness = '<span class="measure-width">Δx</span>';
+  const integral = "<math><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup></math>";
+  $("curve-functions").innerHTML = '<span>0 ≤ y ≤ f(x)</span><span>a ≤ x ≤ b</span>';
+  const dimensions = shell
+    ? `<span class="measure-outer">r = ${sample}</span><span class="measure-inner">h = |f(${sample})|</span>`
+    : `<span class="measure-outer">R = f(${sample})</span>`;
+  $("piece-sample").innerHTML = `<span>${sample} = x + Δx/2</span>${dimensions}`;
+  $("shell-area").hidden = !shell;
+  if (shell) {
+    $("curve-functions").innerHTML += '<span class="formula-domain">0 ≤ a &lt; b</span>';
+    $("piece-math").innerHTML = `<span>ΔV ≈ <span class="measure-outer">2πr</span> × <span class="measure-inner">h</span> × ${thickness}</span>
+      <span>= 2π ${sample} |f(${sample})| ${thickness}</span>`;
+    $("piece-factors").textContent = tr("Circumference × height × thickness", "周长 × 壳高 × 厚度");
+    $("shell-area").innerHTML = `<span class="factors">${tr("Ring area","圆环面积")}</span>
+      <span>π[(x + Δx)² − x²] = 2π ${sample} Δx</span>`;
+    $("integral-math").innerHTML = `<span>dV = 2πx |f(x)| dx</span>
+      <span>V = ${integral} 2πx |f(x)| dx</span>
+      <span class="factors">${tr("|f(x)| is the vertical distance to the x-axis.", "|f(x)| 是曲线到 x 轴的竖直距离。")}</span>`;
+  } else {
+    $("piece-math").innerHTML = `<span>ΔV ≈ <span class="measure-outer">πR²</span> × ${thickness}</span>
+      <span>= π[f(${sample})]² ${thickness}</span>`;
+    $("piece-factors").textContent = tr("Disk area × thickness", "圆盘面积 × 厚度");
+    $("integral-math").innerHTML = `<span>dV = π[f(x)]² dx</span><span>V = ${integral} π[f(x)]² dx</span>`;
+  }
+}
+
+let planeScale;
+function render() {
+  if (phase === "generation") {
+    drawPlane($("generating-plane"));
+    generationSweep.draw();
+    return;
+  }
+  const n = Number($("parts").value);
+  const index = Number($("piece").value) - 1;
+  const data = partition(n);
+  drawSolid(data, index);
+  planeScale = drawPlane($("plane"), data, index);
+  selectedStrip = data.pieces[index];
+  stripSweep.draw();
+  describe(data, index);
+}
+
+let intervalId;
+function updatePlayButton() {
+  $("play").textContent = intervalId === undefined ? tr("Play through pieces", "自动遍历") :
+    tr("Pause traversal", "暂停遍历");
+}
+function stopPlay() {
+  clearInterval(intervalId);
+  intervalId = undefined;
+  $("play").setAttribute("aria-pressed", "false");
+  updatePlayButton();
+}
+function goTo(index) {
+  const slider = $("piece");
+  const target = String(Math.max(1, Math.min(Number($("parts").value), index)));
+  if (target === slider.value) return;
+  slider.value = target;
+  stripSweep.reset();
+  render();
+}
+const methodButtons = document.querySelectorAll("[data-method]");
+
+function syncOptions() {
+  const shell = state.method === "shell";
+  $("generating-figure-title").textContent = tr("Region in the xy plane", "xy 平面上的区域");
+  $("generating-plane").setAttribute("aria-label", tr("Region between y = f(x) and the x-axis from a to b in the xy plane.",
+    "xy 平面上，从 a 到 b、位于 y = f(x) 与 x 轴之间的区域。"));
+  $("rotation-figure-title").textContent = tr("3D rotation · grid at z = 0", "三维旋转 · 网格位于 z = 0");
+  $("generation-summary").textContent = shell
+    ? tr("Revolve the shaded region about the y-axis. The gap between x = 0 and x = a becomes the central hole.",
+      "阴影区域绕 y 轴旋转。x = 0 到 x = a 的间隔形成中央的孔。")
+    : tr("Revolve the region between y = f(x) and the x-axis about the x-axis. A vertical strip sweeps out a solid disk.",
+      "把 y = f(x) 与 x 轴之间的区域绕 x 轴旋转。一条竖直条带扫出一个实心圆盘。");
+  $("volume-title").textContent = shell ? tr("Shell method · about y", "圆柱壳法 · 绕 y 轴") :
+    tr("Disk method · about x", "圆盘法 · 绕 x 轴");
+  $("next-method-nav").hidden = shell;
+  for (const button of methodButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.method === state.method));
+  }
+}
+
+function showPhase(next) {
+  if (phase === next) return;
+  if (next === "volume") {
+    generationSweep.pause();
+  } else {
+    stopPlay();
+    stripSweep.pause();
+  }
+  phase = next;
+  $("generation-stage").hidden = phase !== "generation";
+  $("volume-stage").hidden = phase !== "volume";
+  render();
+  $(phase === "volume" ? "volume-title" : "generation-title").focus({preventScroll:true});
+  window.scrollTo(0,0);
+}
+$("open-calculation").addEventListener("click", () => showPhase("volume"));
+$("back-generation").addEventListener("click", () => showPhase("generation"));
+function selectMethod(method) {
+  if (method === state.method) return;
+  stopPlay();
+  generationSweep.reset();
+  stripSweep.reset();
+  state.method = method;
+  syncOptions();
+  if (phase === "volume") showPhase("generation");
+  else render();
+}
+for (const button of methodButtons) {
+  button.addEventListener("click", () => selectMethod(button.dataset.method));
+}
+$("next-method").addEventListener("click", () => selectMethod("shell"));
+$("parts").addEventListener("input", () => {
+  stopPlay();
+  const slider = $("piece");
+  const relative = (Number(slider.value) - .5) / Number(slider.max);
+  slider.max = $("parts").value;
+  slider.value = String(Math.floor(relative * Number(slider.max)) + 1);
+  stripSweep.reset();
+  render();
+});
+$("piece").addEventListener("input", () => { stopPlay(); stripSweep.reset(); render(); });
+$("previous").addEventListener("click", () => { stopPlay(); goTo(Number($("piece").value) - 1); });
+$("next").addEventListener("click", () => { stopPlay(); goTo(Number($("piece").value) + 1); });
+$("play").addEventListener("click", () => {
+  if (intervalId !== undefined) return stopPlay();
+  stripSweep.pause();
+  if (Number($("piece").value) === Number($("parts").value)) goTo(1);
+  $("play").setAttribute("aria-pressed", "true");
+  intervalId = setInterval(() => {
+    goTo(Number($("piece").value) + 1);
+    if (Number($("piece").value) === Number($("parts").value)) stopPlay();
+  }, 600);
+  updatePlayButton();
+});
+$("isolate").addEventListener("change", render);
+$("reset").addEventListener("click", () => { Object.assign(state, defaultView); render(); });
+
+const solid = $("solid");
+const generationCanvas = $("rotation-canvas");
+function moveCamera(camera, yawChange, pitchChange) {
+  camera.yaw = (camera.yaw + yawChange) % oneTurn;
+  camera.pitch = Math.max(-1.15, Math.min(1.15, camera.pitch + pitchChange));
+}
+
+function enableCameraDrag(canvas, camera, redraw) {
+  let drag;
+  canvas.addEventListener("pointerdown", event => {
+    if (event.button !== 0 || drag) return;
+    canvas.setPointerCapture(event.pointerId);
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  });
+  canvas.addEventListener("pointermove", event => {
+    if (drag?.id !== event.pointerId) return;
+    moveCamera(camera, (event.clientX - drag.x) * .009, (event.clientY - drag.y) * .009);
+    drag.x = event.clientX;
+    drag.y = event.clientY;
+    redraw();
+  });
+  canvas.addEventListener("lostpointercapture", () => { drag = undefined; });
+}
+
+enableCameraDrag(solid, state, () => {
+  const data = partition(Number($("parts").value));
+  drawSolid(data, Number($("piece").value) - 1);
+});
+enableCameraDrag(generationCanvas, generationCamera, generationSweep.draw);
+enableCameraDrag($("strip-canvas"),stripCamera,stripSweep.draw);
+generationCanvas.addEventListener("keydown", event => {
+  const adjustments = { ArrowLeft: [-.12,0], ArrowRight: [.12,0], ArrowUp: [0,.12], ArrowDown: [0,-.12] };
+  const move = adjustments[event.key];
+  if (!move) return;
+  event.preventDefault();
+  moveCamera(generationCamera, ...move);
+  generationSweep.draw();
+});
+$("reset-generation-view").addEventListener("click", () => {
+  Object.assign(generationCamera, defaultGenerationView);
+  generationSweep.draw();
+});
+
+const plane = $("plane");
+plane.style.touchAction = "none";
+plane.style.cursor = "crosshair";
+function selectFromPlane(event) {
+  const {left,scale,xMin} = planeScale;
+  const bounds = plane.getBoundingClientRect();
+  const coordinate = xMin + (event.clientX - bounds.left - left) / scale;
+  const data = partition(Number($("parts").value));
+  goTo(Math.floor((coordinate - data.pieces[0].a) / data.step) + 1);
+}
+plane.addEventListener("pointerdown", event => {
+  if (event.button !== 0) return;
+  stopPlay();
+  plane.setPointerCapture(event.pointerId);
+  selectFromPlane(event);
+});
+plane.addEventListener("pointermove", event => {
+  if (plane.hasPointerCapture(event.pointerId)) selectFromPlane(event);
+});
+function applyLanguage() {
+  const chinese = language === "zh";
+  document.documentElement.lang = chinese ? "zh-Hans" : "en";
+  document.title = tr("Volume by Slicing · AMA1702", "体积切片实验室 · AMA1702");
+  for (const [node,en,zh] of staticText) node.textContent = tr(en,zh);
+  for (const [node,en,zh] of staticLabels) node.setAttribute("aria-label", tr(en,zh));
+  const toggle = $("language-toggle");
+  toggle.textContent = chinese ? "English" : "中文";
+  toggle.lang = chinese ? "en" : "zh-Hans";
+  toggle.setAttribute("aria-label", tr("Switch to Chinese", "切换到英文"));
+  generationSweep.updateButton();
+  stripSweep.updateButton();
+  updatePlayButton();
+  syncOptions();
+  render();
+}
+$("language-toggle").addEventListener("click", () => {
+  language = language === "en" ? "zh" : "en";
+  applyLanguage();
+  try {
+    const url = new URL(location.href);
+    url.searchParams.set("lang", language);
+    history.replaceState(null, "", url);
+  } catch {
+    // Local file URLs can restrict in-place address changes.
+  }
+});
+applyLanguage();
+const layoutObserver = new ResizeObserver(render);
+layoutObserver.observe(solid);
+layoutObserver.observe(plane);
+layoutObserver.observe($("generating-plane"));
+layoutObserver.observe($("rotation-canvas"));
+layoutObserver.observe($("strip-canvas"));
+layoutObserver.observe($("piece-diagram"));
+</script>
+</body>
+</html>
